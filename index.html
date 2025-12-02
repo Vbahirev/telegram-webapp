@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Адаптация под тему Телеграма */
+        body {
+            background-color: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #000);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 { margin-top: 0; }
+        .loader { color: var(--tg-theme-hint-color, #888); }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Данные из Google</h2>
+        <div id="display-area" class="loader">Загрузка...</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // На весь экран
+
+        // Вставьте сюда URL вашего скрипта
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzYWfIqb6uf51uWTfu9vMr1Y_qF7NE1hqK6YxXdjlP4b-llgbsQ-tHkWhpqnvcvz0CM/exec'; // URL - скрипта
+
+        // 1. ЧТЕНИЕ ДАННЫХ (GET)
+        async function loadData() {
+            try {
+                // Добавляем параметр времени, чтобы избежать кэширования
+                const response = await fetch(API_URL + '?t=' + Date.now());
+                const json = await response.json();
+                
+                if (json.status === 'success') {
+                    document.getElementById('display-area').innerHTML = 
+                        `<b>${json.data.title}</b><br>${json.data.message}`;
+                }
+            } catch (e) {
+                document.getElementById('display-area').innerText = 'Ошибка загрузки (CORS или сеть)';
+                console.error(e);
+            }
+        }
+
+        // 2. ОТПРАВКА ДАННЫХ (POST)
+        // Настраиваем Главную Кнопку (синяя внизу)
+        tg.MainButton.setText("Отправить отчет");
+        tg.MainButton.show();
+
+        tg.MainButton.onClick(async () => {
+            tg.MainButton.showProgress(); // Показать крутилку на кнопке
+            
+            const payload = {
+                userId: tg.initDataUnsafe?.user?.id || 0,
+                action: "Нажал кнопку в Mini App"
+            };
+
+            // Для отправки POST в GAS нужно использовать 'no-cors' или специальный формат.
+            // Google Apps Script redirect иногда блокирует чтение ответа в fetch.
+            // Поэтому используем navigator.sendBeacon или простой fetch без ожидания JSON, если возникают проблемы.
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Важно для GAS чтобы не падало с ошибкой
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                tg.showAlert("Данные успешно сохранены в таблицу!");
+            } catch (e) {
+                tg.showAlert("Ошибка отправки");
+            } finally {
+                tg.MainButton.hideProgress();
+            }
+        });
+
+        // Запускаем загрузку при старте
+        loadData();
+    </script>
+</body>
+</html>
