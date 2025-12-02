@@ -1,270 +1,287 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CRM Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>CRM</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
-      /* Стили те же самые, сжаты для краткости */
-      :root { --bg: #f8fafc; --panel: #fff; --text: #0f172a; --accent: #3b82f6; --border: #cbd5e1; --err: #ef4444; --succ: #10b981; }
-      [data-theme="dark"] { --bg: #0f172a; --panel: #1e293b; --text: #f8fafc; --accent: #60a5fa; --border: #475569; }
-      body { margin:0; padding:20px; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; box-sizing:border-box; }
-      .app-wrapper { display:flex; flex-direction:column; height:100%; gap:15px; max-width:800px; margin:0 auto; }
-      .nav { display:flex; gap:10px; overflow-x:auto; padding-bottom:5px; }
-      .nav-btn { padding:10px 15px; border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:8px; cursor:pointer; white-space:nowrap; }
-      .nav-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-      .content { flex:1; background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow-y:auto; padding:20px; position:relative; }
-      .tab { display:none; } .tab.active { display:block; }
-      input, select, button { width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); box-sizing:border-box; }
-      button.btn-primary { background:var(--accent); color:#fff; border:none; font-weight:bold; cursor:pointer; }
-      .loader { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; color:#fff; z-index:999; display:none; flex-direction:column; }
-      .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:8px; display:none; z-index:1000; }
-      .toast.error { background:var(--err); } .toast.success { background:var(--succ); }
-      
-      /* Адаптация под скролл */
-      ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; margin: 0; background: #f5f5f5; color: #000; }
+        .card { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #3390ec; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        button:active { opacity: 0.8; }
+        h3 { margin-top: 0; }
+        .loader { position: fixed; inset: 0; background: rgba(0,0,0,0.8); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
+        .tab-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: #fff; margin-right: 5px; cursor: pointer; }
+        .tab-btn.active { background: #3390ec; color: #fff; border-color: #3390ec; }
+        .nav { overflow-x: auto; white-space: nowrap; padding-bottom: 10px; margin-bottom: 10px; }
+        .hidden { display: none; }
+        #debug { color: red; font-size: 12px; margin-top: 10px; text-align: center; }
     </style>
-  </head>
-  <body>
-    <div id="loader" class="loader"><div style="font-size:30px;">⏳</div><div id="loaderTxt">Загрузка...</div></div>
-    <div id="toast" class="toast"></div>
+</head>
+<body>
 
-    <div class="app-wrapper">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">CRM Система</h2>
-        <button onclick="toggleTheme()" style="width:auto; background:none; border:none; font-size:20px;">🌗</button>
-      </div>
-      
-      <div class="nav">
-        <button class="nav-btn active" onclick="switchTab('Entry')">➕ Ввод</button>
-        <button class="nav-btn" onclick="switchTab('Unshipped')">📦 Отгрузка</button>
-        <button class="nav-btn" onclick="switchTab('Ref')">📚 Товары</button>
-      </div>
-
-      <div class="content">
-        <div id="Entry" class="tab active">
-          <h3>Новая запись</h3>
-          <form onsubmit="handleSaveEntry(event)">
-            <label>Город</label>
-            <select id="entryCity" required></select>
-            
-            <label>Товар (Поиск)</label>
-            <input id="searchInp" oninput="doSearch(this.value)" placeholder="Начните вводить..." autocomplete="off" required>
-            <div id="resList" style="border:1px solid var(--accent); border-radius:5px; max-height:150px; overflow-y:auto; display:none; margin-top:-10px; margin-bottom:10px;"></div>
-            
-            <div style="display:flex; gap:10px;">
-              <div style="flex:1"><label>Кол-во</label><input type="number" id="qty" value="1" min="1" oninput="calcTotal()"></div>
-              <div style="flex:1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; color:var(--accent);" id="totalPreview">0 ₽</div>
-            </div>
-            
-            <button type="submit" class="btn-primary" id="saveBtn">Сохранить</button>
-          </form>
-        </div>
-
-        <div id="Unshipped" class="tab">
-          <div style="display:flex; gap:10px;">
-            <select id="shipCity" onchange="loadUnshippedTable()"></select>
-            <button style="width:auto;" onclick="loadUnshippedTable()">🔄</button>
-          </div>
-          <div id="unshippedList"></div>
-        </div>
-
-        <div id="Ref" class="tab">
-           <h3>Добавить в справочник</h3>
-           <form onsubmit="handleAddProduct(event)">
-             <input id="newPName" placeholder="Название" required>
-             <input id="newPPrice" type="number" placeholder="Цена" required>
-             <input id="newPCat" placeholder="Категория">
-             <button type="submit" class="btn-primary">Добавить</button>
-           </form>
-        </div>
-      </div>
+    <div id="loader" class="loader">
+        <div style="font-size: 30px; margin-bottom: 10px;">⏳</div>
+        <div id="loaderText">Загрузка...</div>
+        <button onclick="forceRetry()" style="width: auto; margin-top: 20px; background: #ff4444; display: none;" id="retryBtn">Сбросить / Попробовать снова</button>
     </div>
 
-    <script>
-      // ==========================================
-      // 👇 ВСТАВЬТЕ СЮДА ВАШУ ССЫЛКУ (Exec URL)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyKA_TUAMbt0Dknl6kPbISyq7_3hY-KPo0LA4y7eOWzRVmYpTidOizNaiixdV06dhO_/exec';
-      // ==========================================
+    <div class="nav">
+        <span class="tab-btn active" onclick="setTab('tab1')">➕ Ввод</span>
+        <span class="tab-btn" onclick="setTab('tab2')">📦 Отгрузка</span>
+        <span class="tab-btn" onclick="setTab('tab3')">📚 Товары</span>
+    </div>
 
-      // Определяем, где мы: В Гугле или В Телеграме?
-      const IS_GOOGLE = typeof google !== 'undefined' && google.script;
-      
-      // Инициализация
-      let CONFIG = {}, PRODUCTS = [];
-      const tg = window.Telegram.WebApp;
-      tg.expand();
-      
-      window.onload = () => {
-         document.getElementById('loader').style.display='flex';
-         initApp();
-         if(localStorage.getItem('theme')==='dark') document.body.setAttribute('data-theme','dark');
-      };
-
-      // --- ГЛАВНАЯ ФУНКЦИЯ-ПЕРЕХОДНИК (HYBRID API) ---
-      async function runBackend(action, data = {}) {
-        if (IS_GOOGLE) {
-           // Режим "Внутри Таблицы" - используем google.script.run
-           return new Promise((resolve, reject) => {
-              // Маппинг строковых действий на функции GAS
-              if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
-              else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(data);
-              else if(action === 'getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(data.city);
-              else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(data.city, data.items);
-              else if(action === 'addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(data.name, data.price, data.cat);
-              else reject("Unknown action in Google Mode");
-           });
-        } else {
-           // Режим "Телеграм/Веб" - используем fetch через прокси
-           // Используем corsproxy.io, если он работает. Если нет, попробуйте 'https://api.allorigins.win/get?url='
-           const proxy = 'https://corsproxy.io/?'; 
-           const targetUrl = new URL(GAS_URL);
-           targetUrl.searchParams.append('action', action);
-           targetUrl.searchParams.append('data', JSON.stringify(data));
-           // Для city отдельно
-           if(data.city) targetUrl.searchParams.append('city', data.city);
-
-           const response = await fetch(proxy + encodeURIComponent(targetUrl.toString()));
-           if(!response.ok) throw new Error("Network error: " + response.status);
-           return await response.json();
-        }
-      }
-
-      // --- ЛОГИКА ПРИЛОЖЕНИЯ ---
-
-      async function initApp() {
-         try {
-           CONFIG = await runBackend('getInitialConfig');
-           PRODUCTS = CONFIG.products || [];
-           fillSel('entryCity', CONFIG.cities);
-           fillSel('shipCity', CONFIG.cities);
-         } catch(e) { showToast('Ошибка: ' + e, true); }
-         finally { document.getElementById('loader').style.display='none'; }
-      }
-
-      async function handleSaveEntry(e) {
-        e.preventDefault();
-        const btn = document.getElementById('saveBtn'); btn.disabled=true; btn.innerText='⏳';
-        try {
-           const res = await runBackend('saveNewEntry', {
-             city: document.getElementById('entryCity').value,
-             productName: document.getElementById('searchInp').value,
-             quantity: document.getElementById('qty').value
-           });
-           if(res.success) { 
-             showToast(res.message); 
-             document.getElementById('searchInp').value='';
-             document.getElementById('qty').value=1;
-             document.getElementById('totalPreview').innerText='0 ₽';
-           } else { showToast(res.message, true); }
-        } catch(err) { showToast("Ошибка: "+err, true); }
-        btn.disabled=false; btn.innerText='Сохранить';
-      }
-      
-      async function loadUnshippedTable() {
-         const city = document.getElementById('shipCity').value;
-         if(!city) return;
-         document.getElementById('unshippedList').innerHTML = 'Загрузка...';
-         try {
-            const list = await runBackend('getUnshippedForCity', {city: city});
-            if(!list.length) { document.getElementById('unshippedList').innerHTML = 'Нет данных'; return; }
+    <div id="tab1" class="tab-content">
+        <div class="card">
+            <h3>Новая запись</h3>
+            <label>Город</label>
+            <select id="citySelect"></select>
             
-            let html = `<div style="margin-bottom:10px;"><b>Всего: ${list.length}</b> <button onclick='doShip("${city}", ${JSON.stringify(list)})' class="btn-primary" style="width:auto; float:right; font-size:12px;">Отгрузить PDF</button></div>`;
-            list.forEach(item => {
-               html += `<div style="border-bottom:1px solid #eee; padding:5px;">
-                 <div><b>${item.name}</b></div>
-                 <div style="font-size:12px; color:#666;">${item.date} | ${item.qty} шт. | ${item.total} ₽</div>
-               </div>`;
-            });
-            document.getElementById('unshippedList').innerHTML = html;
-         } catch(e) { document.getElementById('unshippedList').innerHTML = 'Err: '+e; }
-      }
+            <label>Товар</label>
+            <input type="text" id="prodSearch" placeholder="Поиск..." oninput="doSearch(this.value)">
+            <div id="searchResults" style="max-height: 100px; overflow-y: auto; display: none; border: 1px solid #eee; margin-top: -10px; margin-bottom: 10px;"></div>
+            
+            <div style="display: flex; gap: 10px;">
+                <div style="flex:1">
+                    <label>Кол-во</label>
+                    <input type="number" id="qty" value="1" oninput="calcTotal()">
+                </div>
+                <div style="flex:1; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size: 18px;" id="totalPrice">0 ₽</div>
+            </div>
 
-      async function doShip(city, list) {
-         if(!confirm('Сформировать накладную?')) return;
-         document.getElementById('loader').style.display='flex';
-         try {
-            const res = await runBackend('shipAndGeneratePdf', {city: city, items: list});
-            if(res.success) {
-               // Конвертируем Base64 в файл
-               const bin = atob(res.pdfData);
-               const bytes = new Uint8Array(bin.length);
-               for (let i=0; i<bin.length; i++) bytes[i] = bin.charCodeAt(i);
-               const blob = new Blob([bytes], {type: 'application/pdf'});
-               const url = URL.createObjectURL(blob);
-               window.open(url); // Открыть PDF
-               loadUnshippedTable(); // Обновить
-            } else { showToast(res.message, true); }
-         } catch(e) { showToast("Error: "+e, true); }
-         document.getElementById('loader').style.display='none';
-      }
-      
-      async function handleAddProduct(e) {
-         e.preventDefault();
-         try {
-           const res = await runBackend('addNewProduct', {
-             name: document.getElementById('newPName').value,
-             price: document.getElementById('newPPrice').value,
-             cat: document.getElementById('newPCat').value
-           });
-           showToast(res.message, !res.success);
-           if(res.success) e.target.reset();
-         } catch(e){ showToast("Err: "+e, true); }
-      }
+            <button onclick="saveEntry()">Сохранить</button>
+        </div>
+    </div>
 
-      // Хелперы
-      function fillSel(id, arr) { 
-         const s = document.getElementById(id); s.innerHTML='<option value="">Выберите...</option>'; 
-         if(arr) arr.forEach(x => { let o = document.createElement('option'); o.value=x; o.innerText=x; s.appendChild(o); });
-      }
-      function doSearch(val) {
-         const list = document.getElementById('resList');
-         list.innerHTML=''; list.style.display='none';
-         if(!val) return;
-         const match = PRODUCTS.filter(p => p.name.toLowerCase().includes(val.toLowerCase())).slice(0, 10);
-         if(match.length) {
-            list.style.display='block';
-            match.forEach(p => {
-               const d = document.createElement('div');
-               d.style.padding='8px'; d.style.cursor='pointer'; d.style.borderBottom='1px solid #eee';
-               d.innerHTML = `<b>${p.name}</b> <span style="float:right">${p.price}₽</span>`;
-               d.onclick = () => { 
-                  document.getElementById('searchInp').value = p.name;
-                  calcTotal();
-                  list.style.display='none';
-               };
-               list.appendChild(d);
+    <div id="tab2" class="tab-content hidden">
+        <div class="card">
+            <select id="shipCitySelect" onchange="loadUnshipped()"></select>
+            <button onclick="loadUnshipped()">🔄 Обновить список</button>
+        </div>
+        <div id="shipList"></div>
+    </div>
+
+    <div id="tab3" class="tab-content hidden">
+        <div class="card">
+            <h3>Новый товар</h3>
+            <input id="newPName" placeholder="Название">
+            <input id="newPPrice" type="number" placeholder="Цена">
+            <input id="newPCat" placeholder="Категория">
+            <button onclick="addProduct()">Добавить</button>
+        </div>
+    </div>
+
+    <div id="debug"></div>
+
+    <script>
+        // ===============================================
+        // 👇 ВСТАВЬТЕ НОВУЮ ССЫЛКУ НИЖЕ
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyKA_TUAMbt0Dknl6kPbISyq7_3hY-KPo0LA4y7eOWzRVmYpTidOizNaiixdV06dhO_/exec';
+        // ===============================================
+
+        // Проверяем, где мы запущены
+        const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
+        
+        let DATA = {}; // Храним конфиг здесь
+        let LOAD_TIMEOUT;
+
+        // Инициализация
+        window.onload = function() {
+            window.Telegram.WebApp.expand();
+            startLoading();
+        };
+
+        function startLoading() {
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('retryBtn').style.display = 'none';
+            
+            // Если через 10 секунд не загрузилось - показываем кнопку сброса
+            clearTimeout(LOAD_TIMEOUT);
+            LOAD_TIMEOUT = setTimeout(() => {
+                document.getElementById('loaderText').innerText = "Долго грузится...";
+                document.getElementById('retryBtn').style.display = 'block';
+            }, 10000);
+
+            // Запускаем
+            runBackend('getInitialConfig')
+                .then(data => {
+                    DATA = data;
+                    fillSelect('citySelect', DATA.cities);
+                    fillSelect('shipCitySelect', DATA.cities);
+                    stopLoader();
+                })
+                .catch(err => {
+                    document.getElementById('debug').innerText = "Ошибка: " + err;
+                    document.getElementById('loaderText').innerText = "Ошибка сети";
+                    document.getElementById('retryBtn').style.display = 'block';
+                });
+        }
+
+        // Главная функция общения с сервером
+        async function runBackend(action, payload = {}) {
+            if (IS_GOOGLE) {
+                // Режим внутри Таблицы
+                return new Promise((resolve, reject) => {
+                    if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
+                    else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
+                    else if(action === 'getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(payload.city);
+                    else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(payload.city, payload.items);
+                    else if(action === 'addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(payload.name, payload.price, payload.cat);
+                    else reject("Unknown func");
+                });
+            } else {
+                // Режим Телеграм (через Прокси AllOrigins)
+                const target = new URL(GAS_URL);
+                target.searchParams.append('action', action);
+                target.searchParams.append('data', JSON.stringify(payload));
+                // Добавляем city отдельно для GET запросов
+                if(payload.city) target.searchParams.append('city', payload.city);
+                
+                // Используем AllOrigins как более надежный прокси
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(target.toString());
+                
+                const res = await fetch(proxyUrl);
+                if(!res.ok) throw new Error("Network Error: " + res.status);
+                const json = await res.json();
+                return json;
+            }
+        }
+
+        // --- Логика Интерфейса ---
+
+        function stopLoader() {
+            document.getElementById('loader').style.display = 'none';
+            clearTimeout(LOAD_TIMEOUT);
+        }
+
+        function forceRetry() {
+            location.reload();
+        }
+
+        function fillSelect(id, arr) {
+            const s = document.getElementById(id);
+            s.innerHTML = '';
+            if(arr) arr.forEach(val => {
+                let opt = document.createElement('option');
+                opt.value = val;
+                opt.innerText = val;
+                s.appendChild(opt);
             });
-         }
-      }
-      function calcTotal() {
-         const name = document.getElementById('searchInp').value;
-         const qty = document.getElementById('qty').value;
-         const prod = PRODUCTS.find(p => p.name === name);
-         const price = prod ? prod.price : 0;
-         document.getElementById('totalPreview').innerText = (price * qty) + ' ₽';
-      }
-      function switchTab(id) {
-         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-         document.getElementById(id).classList.add('active');
-         event.target.classList.add('active');
-      }
-      function showToast(msg, isErr) {
-         const t = document.getElementById('toast');
-         t.innerText = msg; t.className = 'toast ' + (isErr ? 'error' : 'success');
-         t.style.display='block'; setTimeout(()=>t.style.display='none', 3000);
-      }
-      function toggleTheme() {
-         const b = document.body;
-         const t = b.getAttribute('data-theme')==='dark'?'light':'dark';
-         b.setAttribute('data-theme', t);
-         localStorage.setItem('theme', t);
-      }
+        }
+
+        function saveEntry() {
+            const city = document.getElementById('citySelect').value;
+            const name = document.getElementById('prodSearch').value;
+            const qty = document.getElementById('qty').value;
+            
+            document.getElementById('loader').style.display = 'flex';
+            runBackend('saveNewEntry', { city: city, productName: name, quantity: qty })
+                .then(res => {
+                    alert(res.message);
+                    document.getElementById('prodSearch').value = '';
+                    document.getElementById('qty').value = 1;
+                    stopLoader();
+                })
+                .catch(err => { alert(err); stopLoader(); });
+        }
+
+        function loadUnshipped() {
+            const city = document.getElementById('shipCitySelect').value;
+            const div = document.getElementById('shipList');
+            div.innerHTML = 'Загрузка...';
+            
+            runBackend('getUnshippedForCity', { city: city })
+                .then(list => {
+                    if(list.length === 0) { div.innerHTML = "Нет товаров"; return; }
+                    let html = `<button onclick='shipItems(${JSON.stringify(list)})' style='background:#10b981; margin-bottom:10px;'>Сформировать PDF (${list.length} поз.)</button>`;
+                    list.forEach(item => {
+                        html += `<div style='border-bottom:1px solid #ccc; padding:5px;'><b>${item.name}</b><br><small>${item.date} | ${item.qty} шт | ${item.total}р</small></div>`;
+                    });
+                    div.innerHTML = html;
+                })
+                .catch(err => div.innerText = err);
+        }
+        
+        function shipItems(list) {
+            if(!confirm("Создать накладную?")) return;
+            const city = document.getElementById('shipCitySelect').value;
+            document.getElementById('loader').style.display = 'flex';
+            
+            runBackend('shipAndGeneratePdf', { city: city, items: list })
+                .then(res => {
+                     // Скачиваем PDF
+                     const byteCharacters = atob(res.pdfData);
+                     const byteNumbers = new Array(byteCharacters.length);
+                     for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                     }
+                     const byteArray = new Uint8Array(byteNumbers);
+                     const blob = new Blob([byteArray], {type: "application/pdf"});
+                     const link = document.createElement('a');
+                     link.href = window.URL.createObjectURL(blob);
+                     link.download = "Invoice.pdf";
+                     link.click();
+                     
+                     stopLoader();
+                     loadUnshipped(); // Обновить список
+                })
+                .catch(err => { alert(err); stopLoader(); });
+        }
+
+        function addProduct() {
+             const name = document.getElementById('newPName').value;
+             const price = document.getElementById('newPPrice').value;
+             const cat = document.getElementById('newPCat').value;
+             
+             document.getElementById('loader').style.display = 'flex';
+             runBackend('addNewProduct', { name: name, price: price, cat: cat })
+                .then(res => { alert(res.message); stopLoader(); })
+                .catch(err => { alert(err); stopLoader(); });
+        }
+
+        // Поиск товара (frontend search)
+        function doSearch(val) {
+            const div = document.getElementById('searchResults');
+            div.innerHTML = '';
+            div.style.display = 'none';
+            if(!val) return;
+            
+            const matches = (DATA.products || []).filter(p => p.name.toLowerCase().includes(val.toLowerCase()));
+            if(matches.length > 0) {
+                div.style.display = 'block';
+                matches.slice(0, 10).forEach(p => {
+                    let d = document.createElement('div');
+                    d.style.padding = '8px';
+                    d.style.borderBottom = '1px solid #eee';
+                    d.innerHTML = `<b>${p.name}</b> <span style='float:right'>${p.price}</span>`;
+                    d.onclick = () => {
+                        document.getElementById('prodSearch').value = p.name;
+                        calcTotal();
+                        div.style.display = 'none';
+                    };
+                    div.appendChild(d);
+                });
+            }
+        }
+        
+        function calcTotal() {
+            const name = document.getElementById('prodSearch').value;
+            const qty = document.getElementById('qty').value;
+            const p = (DATA.products || []).find(x => x.name === name);
+            const price = p ? p.price : 0;
+            document.getElementById('totalPrice').innerText = (price * qty) + " ₽";
+        }
+
+        function setTab(id) {
+            document.querySelectorAll('.tab-content').forEach(d => d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
     </script>
-  </body>
+</body>
 </html>
