@@ -8,7 +8,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-      /* ВЕСЬ ВАШ CSS ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ */
+      /* ВАШ ОРИГИНАЛЬНЫЙ CSS БЕЗ ИЗМЕНЕНИЙ */
       :root {
         --bg-app: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
         --accent: #3b82f6; --border: #cbd5e1; --input-bg: #ffffff;
@@ -162,37 +162,39 @@
       let LAST_DATA = null; 
       
       // ===============================================
-      // 👇 ВСТАВЬТЕ СЮДА ВАШУ НОВУЮ ССЫЛКУ ИЗ ШАГА 1
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzAZd4yO2LCbHrJBjAlJIKI0UHItV1pQp3uf8gnoh2rdQpo-1IwmVSRemUhoZ6Fup1E/exec';
+      // 👇 ВСТАВЬТЕ СЮДА ВАШУ НОВУЮ ССЫЛКУ ОТ GOOGLE
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbylvMn0rkcOxZsWaMCoEl6CLP476rO77S4Wj5eMiaDevzZEyRLtVsL3qxXWkwKKGip6/exec';
       // ===============================================
 
       const tg = window.Telegram.WebApp;
       tg.expand();
 
-      // ПРОВЕРКА: Если мы ВНУТРИ Google, то объект google.script существует.
+      // Проверка: где мы запущены?
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
 
-      // === ГЛАВНАЯ ФУНКЦИЯ: ЕДИНЫЙ ПРОВОДНИК ДЛЯ ДАННЫХ ===
+      // === ЕДИНАЯ ФУНКЦИЯ ДЛЯ ОТПРАВКИ ДАННЫХ ===
       async function runBackend(action, data = {}) {
         if (IS_GOOGLE) {
-           // Режим "Внутри Таблицы": используем нативный google.script.run
+           // Режим "Внутри Таблицы": используем google.script.run
            return new Promise((resolve, reject) => {
-              if(action==='getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
-              else if(action==='saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(data);
-              else if(action==='getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(data.city);
-              else if(action==='shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(data.city, data.items);
-              else if(action==='addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(data.name, data.price, data.cat);
-              else if(action==='getAnalyticsData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAnalyticsData(data.p, data.m, data.y, data.c);
+              const handler = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
+              
+              if(action==='getInitialConfig') handler.getInitialConfig();
+              else if(action==='saveNewEntry') handler.saveNewEntry(data);
+              else if(action==='getUnshippedForCity') handler.getUnshippedForCity(data.city);
+              else if(action==='shipAndGeneratePdf') handler.shipAndGeneratePdf(data.city, data.items);
+              else if(action==='addNewProduct') handler.addNewProduct(data.name, data.price, data.cat);
+              else if(action==='getAnalyticsData') handler.getAnalyticsData(data.p, data.m, data.y, data.c);
               else reject("Unknown action (Google Mode)");
            });
         } else {
-           // Режим "Телеграм": используем fetch + proxy
+           // Режим "Телеграм": используем fetch через стабильный прокси
            const targetUrl = new URL(GAS_URL);
            targetUrl.searchParams.append('action', action);
            targetUrl.searchParams.append('data', JSON.stringify(data));
-           if(data.city) targetUrl.searchParams.append('city', data.city); // Дублируем для надежности
+           if(data.city) targetUrl.searchParams.append('city', data.city); 
 
-           // Используем надежный прокси allorigins, так как corsproxy часто падает
+           // Используем AllOrigins (более стабильный чем corsproxy.io)
            const proxy = 'https://api.allorigins.win/raw?url=';
            
            try {
@@ -205,8 +207,6 @@
            }
         }
       }
-
-      // === ДАЛЕЕ ВАШ КОД, НО С ВЫЗОВАМИ runBackend ВМЕСТО google.script.run ===
 
       window.onload = () => { 
         document.getElementById('loader').style.display='flex'; 
