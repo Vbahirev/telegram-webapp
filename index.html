@@ -29,20 +29,24 @@
       label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; }
       input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box; }
       input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-      .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
-      .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
       
-      /* --- ИЗМЕНЕНИЯ ЗДЕСЬ: Скрываем системные стрелки --- */
-      .qty-input { 
-        width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; 
-        -moz-appearance: textfield; /* Firefox */
-      }
-      .qty-input::-webkit-outer-spin-button,
-      .qty-input::-webkit-inner-spin-button {
+      /* --- ИЗМЕНЕНИЯ ЗДЕСЬ: Глобальное отключение стрелок --- */
+      /* Это убирает стрелки для ВСЕХ полей ввода чисел (Цена, Количество и др.) */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
       }
-      /* -------------------------------------------------- */
+      input[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
+      }
+      /* ----------------------------------------------------- */
+
+      .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
+      .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
+      
+      /* Стиль именно для поля внутри кнопок +/-, стрелки убраны глобальным правилом выше */
+      .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
 
       .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
       .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -191,7 +195,6 @@
       // --- УНИВЕРСАЛЬНЫЙ МОСТ (БЕЗ ПРОКСИ) ---
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
-             // Режим: Внутри Google Таблицы
              return new Promise((resolve, reject) => {
                  if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
@@ -202,28 +205,22 @@
                  else reject("Unknown Func");
              });
          } else {
-             // Режим: Telegram / Web (POST запрос text/plain)
              if(GAS_URL.includes("ВАШ_ДЛИННЫЙ_ID")) {
                 alert("ОШИБКА: Вставь ссылку в код Dashboard.html!");
                 throw new Error("No URL");
              }
-             
              payload.action = action;
-             
              try {
                  const res = await fetch(GAS_URL, {
                      method: "POST",
-                     // Хитрость: text/plain не вызывает preflight CORS
                      headers: { "Content-Type": "text/plain;charset=utf-8" },
                      body: JSON.stringify(payload)
                  });
-                 
                  const text = await res.text();
                  try {
                     return JSON.parse(text);
                  } catch(e) {
                     console.error("Server HTML:", text);
-                    // Если вернулся HTML, значит проблема с доступом
                     if(text.includes("<!DOCTYPE")) throw new Error("Ошибка доступа! Проверь Deploy: 'Anyone'");
                     throw new Error("Server Error: " + text);
                  }
@@ -233,8 +230,6 @@
          }
       }
 
-      // --- ЛОГИКА ИНТЕРФЕЙСА ---
-      
       function loadConfig(){
         runBackend('getInitialConfig')
         .then(c => {
