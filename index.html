@@ -153,8 +153,8 @@
 
     <script>
       // ===============================================
-      // ⚠️ ВАЖНО: ВСТАВЬТЕ СЮДА НОВУЮ ССЫЛКУ ИЗ ШАГА 2
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzqiWAHpbuaZWVBXW8olQ4VN2ctFGAC13mbEnTPG2VOszHuWlWEm2DknL0F9saBbtkz/exec';
+      // ⚠️ ВСТАВЬТЕ СЮДА ССЫЛКУ ИЗ ШАГА 2
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycby7KibQtXp7kOgLdQvQOqvKf-xTdpLKI8JxMMo11ONMF8bwlUAQ4uDeoG_6Lg4zDvRH/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -171,7 +171,6 @@
         if(localStorage.getItem('crm_theme')==='dark') document.body.setAttribute('data-theme','dark');
       };
 
-      // --- ОБНОВЛЕННЫЙ МЕХАНИЗМ (POST БЕЗ ПРОКСИ) ---
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
              return new Promise((resolve, reject) => {
@@ -185,28 +184,29 @@
              });
          } else {
              if(GAS_URL.includes("ВАШ_НОВЫЙ_ID")) {
-                alert("ОШИБКА: Вы не вставили ссылку на скрипт (GAS_URL)!");
+                alert("ОШИБКА: Вы не вставили ссылку GAS_URL!");
                 throw new Error("No URL");
              }
              
-             // Добавляем action в тело запроса
              payload.action = action;
              
-             // 🔥 ПРЯМОЙ POST ЗАПРОС (БЕЗ ПРОКСИ)
-             // Google позволяет это, если Content-Type = text/plain
+             // 🔥 ИСПОЛЬЗУЕМ POST С TEXT/PLAIN (ЭТО САМЫЙ НАДЕЖНЫЙ СПОСОБ ДЛЯ GAS)
              try {
                  const res = await fetch(GAS_URL, {
                      method: "POST",
-                     redirect: "follow", // Следовать за редиректом Google
-                     headers: {
-                         "Content-Type": "text/plain;charset=utf-8", 
-                     },
+                     redirect: "follow", 
+                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                      body: JSON.stringify(payload)
                  });
                  
-                 if(!res.ok) throw new Error("Network Error: " + res.status);
-                 const json = await res.json();
-                 return json;
+                 // Если Google вернул HTML ошибки вместо JSON (бывает при 404/Auth)
+                 const text = await res.text();
+                 try {
+                    return JSON.parse(text);
+                 } catch(e) {
+                    console.error("Server returned HTML:", text);
+                    throw new Error("Сервер вернул ошибку (HTML). Проверьте Deploy 'Anyone'.");
+                 }
              } catch(e) {
                  throw e;
              }
