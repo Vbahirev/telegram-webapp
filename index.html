@@ -4,7 +4,7 @@
     <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CRM Manager v2.0</title>
+    <title>CRM Manager v2.2</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -159,7 +159,7 @@
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА СВОЙ URL GAS
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbz-XuAumuHpYdWJ7VOKlGD3MUVyNBW6XwQL3lQFCaaIt5QCghZ83KaLp6GjjIEXC6_y/exec'; 
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbxoT_8Y6a17qysmNNIZaQx0bgN1RBGnZ9-zqsZJT_WtpEOv955TwE4il6lZkusgcLg/exec'; 
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -180,7 +180,6 @@
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
              return new Promise((resolve, reject) => {
-                 // Маппинг для Google Script Run
                  if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
                  else if(action === 'getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(payload.city);
@@ -218,7 +217,6 @@
         }).catch(err => { showToast("Ошибка Config: " + err, true); document.getElementById('loader').style.display='none'; });
       }
 
-      // --- ЛОГИКА ОТГРУЗКИ (Unshipped) С РЕДАКТИРОВАНИЕМ ---
       function loadUnshippedTable(){
         const c=document.getElementById('shipCity').value, d=document.getElementById('unshippedContent');
         if(!c)return;
@@ -235,7 +233,6 @@
                    <table><thead><tr><th class="w-check"><input type="checkbox" onchange="toggleAll(this)" checked></th><th>Товар</th><th>Кол</th><th>Действ.</th></tr></thead><tbody>`;
             
             i.forEach((x, idx)=>{ 
-               // rowIndex важен для бэкенда. Используем data-аттрибуты
                h+=`<tr id="row-${idx}">
                      <td class="w-check"><input type="checkbox" class="ship-chk" data-idx="${idx}" checked></td>
                      <td onclick="editUnshippedCell('${c}', ${x.rowIndex}, 'name', ${idx})"><span id="name-${idx}">${x.name}</span></td>
@@ -252,33 +249,23 @@
 
       function editUnshippedCell(city, rowId, field, localIdx) {
          const span = document.getElementById(`${field}-${localIdx}`);
-         if(span.querySelector('input')) return; // Уже редактируется
+         if(span.querySelector('input')) return; 
          const oldVal = span.innerText;
-         
          const inp = document.createElement('input');
          inp.type = field === 'qty' ? 'number' : 'text';
          inp.value = oldVal;
          inp.className = 'edit-inp';
-         
-         // Сохранение по блюру (потере фокуса)
          inp.onblur = () => {
              const newVal = inp.value;
              if(newVal === oldVal) { span.innerHTML = oldVal; return; }
              span.innerHTML = '⏳';
              runBackend('updateOrder', {city: city, rowIndex: rowId, field: field, value: newVal})
              .then(r => {
-                 if(r.success) { 
-                     span.innerText = newVal; 
-                     showToast("Обновлено");
-                     // Если обновили кол-во или имя, хорошо бы пересчитать итого, но для скорости оставим так
-                 }
+                 if(r.success) { span.innerText = newVal; showToast("Обновлено"); }
                  else { span.innerText = oldVal; showToast("Ошибка обновления", true); }
              });
          };
-         
-         span.innerHTML = '';
-         span.appendChild(inp);
-         inp.focus();
+         span.innerHTML = ''; span.appendChild(inp); inp.focus();
       }
 
       function deleteUnshippedItem(city, rowId, localIdx) {
@@ -286,13 +273,8 @@
           document.getElementById(`row-${localIdx}`).style.opacity = '0.3';
           runBackend('deleteOrder', {city: city, rowIndex: rowId})
           .then(r => {
-              if(r.success) { 
-                  document.getElementById(`row-${localIdx}`).remove(); 
-                  showToast("Удалено");
-              } else {
-                  document.getElementById(`row-${localIdx}`).style.opacity = '1';
-                  showToast("Ошибка удаления", true);
-              }
+              if(r.success) { document.getElementById(`row-${localIdx}`).remove(); showToast("Удалено"); } 
+              else { document.getElementById(`row-${localIdx}`).style.opacity = '1'; showToast("Ошибка удаления", true); }
           });
       }
 
@@ -316,7 +298,6 @@
         }).catch(e => { closeLoader(); showToast("Ошибка: " + e, true); });
       }
 
-      // --- СПРАВОЧНИК С РЕДАКТИРОВАНИЕМ ---
       function fillRefTable(d){
         const t=document.querySelector('#refTable tbody'); t.innerHTML='';
         d.forEach((x, i)=>{
@@ -332,7 +313,6 @@
       }
 
       function editRef(pkName, field, idx) {
-         // pkName - Primary Key (старое имя товара)
          const idMap = { 'name': `rn-${idx}`, 'cat': `rc-${idx}`, 'price': `rp-${idx}` };
          const span = document.getElementById(idMap[field]);
          const oldVal = span.innerText;
@@ -344,28 +324,17 @@
          inp.onblur = () => {
              const newVal = inp.value;
              if(newVal === oldVal) { span.innerHTML = oldVal; return; }
-             
-             // Собираем полные данные для апдейта (нужны все поля, если меняем одно, т.к. бэкенд ищет по имени)
-             const rowName = document.getElementById(`rn-${idx}`).innerText; // Текущее имя в UI
-             // Если меняем имя, то oldName - это pkName, а newName - это newVal
-             // Если меняем цену, то oldName = pkName, newName = pkName
-             
              const payload = {
                 oldName: pkName,
                 newName: field === 'name' ? newVal : pkName,
                 price: field === 'price' ? newVal : document.getElementById(`rp-${idx}`).innerText,
                 cat: field === 'cat' ? newVal : document.getElementById(`rc-${idx}`).innerText
              };
-
              span.innerHTML = '⏳';
              runBackend('updateProductRef', payload).then(r => {
                  if(r.success) { 
                      span.innerText = newVal; 
-                     // Если поменяли имя, надо обновить onclick атрибуты, иначе следующий эдит сломается
-                     if(field === 'name') {
-                        // Простой релоад конфига, чтобы обновить связи
-                        loadConfig(); 
-                     }
+                     if(field === 'name') loadConfig(); 
                      showToast("Справочник обновлен");
                  } else { span.innerText = oldVal; showToast("Ошибка", true); }
              });
@@ -392,7 +361,6 @@
         });
       }
 
-      // --- ОБЩИЕ ФУНКЦИИ ---
       function saveEntry(e){
         e.preventDefault();
         const b=document.getElementById('saveBtn'); b.disabled=true; b.innerText='⏳...';
@@ -439,7 +407,6 @@
          CHARTS[id] = new Chart(ctx, { type:type, data:data, options:{ maintainAspectRatio:false, plugins:{legend:{display:false}}, ...opts } });
       }
 
-      // Utils
       function showToast(m,e=false){const x=document.getElementById("toast");x.innerText=m;x.className=e?"toast show error":"toast show success";setTimeout(()=>x.className=x.className.replace("show",""),3000);}
       function changeQty(d){const e=document.getElementById('qty');let v=parseInt(e.value)||0;v+=d;if(v<1)v=1;e.value=v;calcTotal();}
       function base64ToBlob(b64) { const bs = window.atob(b64), len = bs.length, bytes = new Uint8Array(len); for (let i = 0; i < len; i++) bytes[i] = bs.charCodeAt(i); return new Blob([bytes], { type: 'application/pdf' }); }
