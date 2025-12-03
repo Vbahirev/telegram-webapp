@@ -31,7 +31,19 @@
       input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
       .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
       .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
-      .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
+      
+      /* --- ИЗМЕНЕНИЯ ЗДЕСЬ: Скрываем системные стрелки --- */
+      .qty-input { 
+        width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; 
+        -moz-appearance: textfield; /* Firefox */
+      }
+      .qty-input::-webkit-outer-spin-button,
+      .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      /* -------------------------------------------------- */
+
       .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
       .btn:disabled { opacity: 0.6; cursor: not-allowed; }
       .btn-sm { width: auto; padding: 8px 20px; font-size: 13px; }
