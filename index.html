@@ -183,7 +183,7 @@
       .res-item:hover { background: var(--input-bg); color: var(--accent);
       }
 
-      /* НОВЫЙ КЛАСС ДЛЯ ВЫРАВНИВАНИЯ СТРОКИ ОТГРУЗКИ */
+      /* МОБИЛЬНАЯ ВЕРСТКА: Строка выбора города */
       .ship-row {
           display: flex; gap: 15px; align-items: center; width: 100%; flex-wrap: wrap;
       }
@@ -224,17 +224,17 @@
         .w-check { width: 100%; text-align: left;
         }
 
-        /* ИСПРАВЛЕНИЕ ДЛЯ ОТГРУЗКИ НА МОБИЛЬНЫХ */
+        /* ИСПРАВЛЕНИЕ: Выбор города в столбик на телефоне */
         .ship-row {
-            flex-direction: column !important; /* В столбик */
-            align-items: stretch !important;   /* Растянуть на всю ширину */
+            flex-direction: column !important;
+            align-items: stretch !important;
         }
         .ship-row > div {
             width: 100% !important;
             flex: none !important;
         }
         .ship-row button {
-            width: 100% !important; /* Кнопка во всю ширину */
+            width: 100% !important;
             margin-top: 5px;
         }
       }
@@ -417,7 +417,7 @@
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycby1roJ6Gv-4ZY-E_SS3nQ_vtjo6kPSt1ZOmqNeR4SJzW8BXPc5wFj1Nx8mDoNrehHaO/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbxgjeT2W2PrRJk5PXmJxjLZPXmc0BAR0_i0ustJC2ohARZrKc6Sg6U-4A2VyoVLy-Wn/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -636,6 +636,7 @@
         .then(r => { showToast(r.message, !r.success); b.disabled=false; b.innerText=t; if(r.success){ document.getElementById('searchInp').value=''; document.getElementById('qty').value=1; calcTotal(); }})
         .catch(err => { showToast("Ошибка: "+err, true); b.disabled=false; b.innerText=t; });
       }
+
       function doShip(c){
         const d=document.getElementById('unshippedContent'); if(!d.dataset.items) return;
         const checkboxes = document.querySelectorAll('.ship-chk:checked');
@@ -649,30 +650,26 @@
         
         runBackend('shipAndGeneratePdf', { city: c, items: selectedItems }).then(r => {
             if(r.success){ 
-                // --- НАЧАЛО ИЗМЕНЕНИЙ ---
-                // Проверяем: если ширина экрана больше 768px (ПК), то открываем PDF.
-                // Если меньше (телефон) - просто уведомляем.
+                // ПРОВЕРКА НА МОБИЛЬНОЕ УСТРОЙСТВО
                 const isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 
                 if (!isMobile) {
-                    // Это ПК: Открываем PDF
                     window.open(window.URL.createObjectURL(base64ToBlob(r.pdfData)), '_blank');
                 } else {
-                    // Это Телефон: Просто показываем сообщение
                     showToast("✅ Отгружено! (PDF создан)", false);
                 }
-                // --- КОНЕЦ ИЗМЕНЕНИЙ ---
-
                 loader.style.display='none'; loaderTxt.innerText = "Загрузка..."; loadUnshippedTable(); 
             }
             else { loader.style.display='none'; loaderTxt.innerText = "Загрузка..."; showToast(r.message, true); }
         }).catch(e => { loader.style.display='none'; loaderTxt.innerText = "Загрузка..."; showToast("Ошибка: " + e, true); });
       }
+
       function addRef(e){ e.preventDefault(); const b=document.getElementById('productSubmitBtn'),t=b.innerText; b.disabled=true; b.innerText='⏳';
         runBackend('addNewProduct', { name: document.getElementById('newPName').value, price: document.getElementById('newPPrice').value, cat: document.getElementById('newPCat').value })
         .then(r => { showToast(r.message, !r.success); b.disabled=false; b.innerText=t; if(r.success){ document.getElementById('newPName').value=''; document.getElementById('newPPrice').value=''; document.getElementById('newPCat').value=''; loadConfig(); }})
         .catch(err => { b.disabled=false; b.innerText=t; showToast("Error: " + err, true); });
       }
+
       function loadAnalytics(){ document.getElementById('loader').style.display = 'flex';
         let p = 'month', m = document.getElementById('anMonth').value;
         if(m === 'all') { p = 'year'; m = 0;
@@ -695,35 +692,35 @@
          r.style.display = txt.toLowerCase().includes(v) ? '' : 'none';
       })}
       
-      // ИСПРАВЛЕННАЯ ФУНКЦИЯ drawAnalytics (Адаптация под мобильные)
+      // === ИСПРАВЛЕННЫЕ ГРАФИКИ (АДАПТИВНОСТЬ) ===
       function drawAnalytics(d) { 
         LAST_DATA = d;
         const g = d.prevRev > 0 ? ((d.totalRev - d.prevRev)/d.prevRev)*100 : 0;
         
-        // 1. KPI карточки (без изменений)
+        // 1. KPI карточки
         document.getElementById('kpi').innerHTML=`<div class="card"><div class="card-lbl">Выручка</div><div class="card-val" style="color:var(--accent)">${d.totalRev.toLocaleString()} ₽</div><div class="trend-badge ${g>=0?'trend-up':'trend-down'}">${g>=0?'↑':'↓'} ${Math.abs(g).toFixed(1)}%</div><div class="sub-text">Прошлый: ${d.prevRev.toLocaleString()} ₽</div></div><div class="card"><div class="card-lbl">В ожидании</div><div class="card-val" style="color:#f59e0b">${d.pend.toLocaleString()} ₽</div><div class="sub-text">Это <b>${(d.totalRev+d.pend)>0?((d.pend/(d.totalRev+d.pend))*100).toFixed(1):0}%</b> от всего объема</div></div><div class="card"><div class="card-lbl">Заказы</div><div class="card-val">${d.count}</div><div class="sub-text">Успешных сделок</div></div><div class="card"><div class="card-lbl">Ср. Чек</div><div class="card-val" style="color:var(--success)">${d.avg.toLocaleString()} ₽</div></div>`; 
         
-        // Определяем цвета и мобильный режим
+        // Цвета темы
         const th=document.body.getAttribute('data-theme');
         const c=th==='dark'?'#cbd5e1':'#64748b';
         const gridColor=th==='dark'?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)';
         
-        // --- ПРОВЕРКА МОБИЛЬНОГО УСТРОЙСТВА ---
+        // Проверка мобильного устройства
         const isMobile = window.innerWidth < 768;
 
-        // 2. График Тренда (Bar)
+        // 2. График Тренда (Bar) - Добавлен autoSkip и maintainAspectRatio
         renderChart('chartTrend', 'bar', {
             labels: d.trendL, 
             datasets: [{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]
         }, {
-            maintainAspectRatio: false, // Важно для вписывания в блок
+            maintainAspectRatio: false, 
             scales: {
-                x: { grid:{display:false}, ticks:{color:c, maxRotation: 0, autoSkip: true} }, // autoSkip чтобы подписи не наезжали
+                x: { grid:{display:false}, ticks:{color:c, maxRotation: 0, autoSkip: true} }, 
                 y: { grid:{color:gridColor}, ticks:{color:c} }
             }
         }); 
 
-        // 3. График Городов (Doughnut) - ИСПРАВЛЕНИЕ ЛЕГЕНДЫ
+        // 3. График Городов (Doughnut) - Легенда снизу на телефоне
         renderChart('chartCity', 'doughnut', {
             labels: d.cityStats ? Object.keys(d.cityStats) : [], 
             datasets: [{
@@ -732,18 +729,17 @@
                 borderWidth: 0
             }]
         }, {
-            maintainAspectRatio: false, // Важно
-            layout: { padding: { bottom: 10 } }, // Небольшой отступ
+            maintainAspectRatio: false, 
+            layout: { padding: { bottom: 10 } }, 
             plugins: {
                 legend: {
-                    // ЕСЛИ МОБИЛЬНЫЙ — ЛЕГЕНДА СНИЗУ, ЕСЛИ ПК — СПРАВА
                     position: isMobile ? 'bottom' : 'right',
                     labels: { color:c, font:{size:11}, boxWidth:12, padding: 15 }
                 }
             }
         });
 
-        // 4. График Категорий (Horizontal Bar)
+        // 4. График Категорий
         renderChart('chartCat', 'bar', {
             labels: Object.keys(d.catStats), 
             datasets: [{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]
@@ -756,7 +752,7 @@
             }
         }); 
         
-        // 5. Топ таблица (без изменений)
+        // 5. Топ таблица
         const tb = document.querySelector('#topTable tbody'); tb.innerHTML = '';
         if (d.top) d.top.forEach(x => { 
            const tr=document.createElement('tr'); 
@@ -764,6 +760,7 @@
            tb.appendChild(tr); 
         });
       }
+
       function renderChart(id, type, data, opts) { if(CHARTS[id]) CHARTS[id].destroy(); const ctx = document.getElementById(id).getContext('2d');
         const d={ maintainAspectRatio:false, plugins:{legend:{display:false}} }; CHARTS[id] = new Chart(ctx, { type:type, data:data, options:{...d, ...opts, plugins:{...d.plugins, ...opts.plugins}} });
       }
