@@ -10,8 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-      :root { --bg-app: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --accent: #3b82f6; --border: #cbd5e1; --input-bg: #ffffff; --success: #10b981; --danger: #ef4444; --card-kpi-bg: #ffffff; --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
-      [data-theme="dark"] { --bg-app: #0f172a; --bg-panel: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; --accent: #60a5fa; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b; --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
+      :root { --bg-app: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --accent: #3b82f6; --border: #cbd5e1; --input-bg: #ffffff; --success: #10b981; --danger: #ef4444; --card-kpi-bg: #ffffff; }
+      [data-theme="dark"] { --bg-app: #0f172a; --bg-panel: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; --accent: #60a5fa; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b; }
       body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); transition: 0.3s; height: 100vh; box-sizing: border-box; overflow: hidden; }
       .app-wrapper { display: flex; flex-direction: column; height: 100%; gap: 15px; max-width: 1200px; margin: 0 auto; width: 100%; }
       .toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-app); text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s; }
@@ -29,7 +29,6 @@
       label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; }
       input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box; }
       input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-      select { appearance: none; -webkit-appearance: none; background-image: var(--arrow-icon); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
       .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
       .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
       .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
@@ -87,6 +86,7 @@
         <button class="nav-btn" onclick="tab('Ref')">📚 Справочник</button>
         <button class="nav-btn" onclick="tab('Analytics')">📊 Аналитика</button>
       </div>
+      
       <div class="content-area">
         <div id="Entry" class="tab-page active">
            <div style="max-width: 500px; margin: 0 auto;">
@@ -107,6 +107,7 @@
              </form>
            </div>
         </div>
+
         <div id="Unshipped" class="tab-page">
            <div style="background: var(--input-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
              <label style="font-size:13px; margin-bottom:10px;">ВЫБЕРИТЕ ГОРОД ДЛЯ ОТГРУЗКИ:</label>
@@ -117,6 +118,7 @@
            </div>
            <div id="unshippedContent"><div style="text-align:center; color:var(--text-sub); margin-top: 50px;"><div style="font-size: 40px; margin-bottom:10px;">🏪</div>Выберите город выше</div></div>
         </div>
+
         <div id="Ref" class="tab-page">
            <div style="display:grid; grid-template-columns: 300px 1fr; gap: 30px;">
              <div style="background: var(--bg-panel); padding: 20px; border-radius: 12px; height: fit-content; border: 1px solid var(--border);">
@@ -131,6 +133,7 @@
              <div><input type="text" id="filterRef" placeholder="🔍 Фильтр..." onkeyup="filterRef()" style="margin-bottom: 10px;"><div style="max-height: 500px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px;"><table id="refTable"><thead><tr><th>Товар</th><th>Категория</th><th>Цена</th></tr></thead><tbody></tbody></table></div></div>
            </div>
         </div>
+
         <div id="Analytics" class="tab-page">
            <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap: wrap;">
              <select id="anYear" style="width:120px" onchange="loadAnalytics()"></select>
@@ -153,8 +156,8 @@
 
     <script>
       // ===============================================
-      // ⚠️ ВСТАВЬТЕ СЮДА ССЫЛКУ ИЗ ШАГА 2
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycby7KibQtXp7kOgLdQvQOqvKf-xTdpLKI8JxMMo11ONMF8bwlUAQ4uDeoG_6Lg4zDvRH/exec';
+      // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyefNUSI8APJeTDh82Zv6vOy2r3_9kTQMtpiRH630K82Q-7rB1xjI1zS8k_5uVCTmWe/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -163,7 +166,9 @@
       window.onload = () => { 
         if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
         document.getElementById('loader').style.display='flex'; 
+        
         loadConfig(); 
+        
         document.getElementById('formEntry').onsubmit=saveEntry; 
         document.getElementById('formRef').onsubmit=addRef; 
         document.getElementById('searchInp').oninput=smartSearch; 
@@ -171,8 +176,10 @@
         if(localStorage.getItem('crm_theme')==='dark') document.body.setAttribute('data-theme','dark');
       };
 
+      // --- УНИВЕРСАЛЬНЫЙ МОСТ (БЕЗ ПРОКСИ) ---
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
+             // Режим: Внутри Google Таблицы
              return new Promise((resolve, reject) => {
                  if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
@@ -183,29 +190,30 @@
                  else reject("Unknown Func");
              });
          } else {
-             if(GAS_URL.includes("ВАШ_НОВЫЙ_ID")) {
-                alert("ОШИБКА: Вы не вставили ссылку GAS_URL!");
+             // Режим: Telegram / Web (POST запрос text/plain)
+             if(GAS_URL.includes("ВАШ_ДЛИННЫЙ_ID")) {
+                alert("ОШИБКА: Вставь ссылку в код Dashboard.html!");
                 throw new Error("No URL");
              }
              
              payload.action = action;
              
-             // 🔥 ИСПОЛЬЗУЕМ POST С TEXT/PLAIN (ЭТО САМЫЙ НАДЕЖНЫЙ СПОСОБ ДЛЯ GAS)
              try {
                  const res = await fetch(GAS_URL, {
                      method: "POST",
-                     redirect: "follow", 
+                     // Хитрость: text/plain не вызывает preflight CORS
                      headers: { "Content-Type": "text/plain;charset=utf-8" },
                      body: JSON.stringify(payload)
                  });
                  
-                 // Если Google вернул HTML ошибки вместо JSON (бывает при 404/Auth)
                  const text = await res.text();
                  try {
                     return JSON.parse(text);
                  } catch(e) {
-                    console.error("Server returned HTML:", text);
-                    throw new Error("Сервер вернул ошибку (HTML). Проверьте Deploy 'Anyone'.");
+                    console.error("Server HTML:", text);
+                    // Если вернулся HTML, значит проблема с доступом
+                    if(text.includes("<!DOCTYPE")) throw new Error("Ошибка доступа! Проверь Deploy: 'Anyone'");
+                    throw new Error("Server Error: " + text);
                  }
              } catch(e) {
                  throw e;
@@ -213,6 +221,8 @@
          }
       }
 
+      // --- ЛОГИКА ИНТЕРФЕЙСА ---
+      
       function loadConfig(){
         runBackend('getInitialConfig')
         .then(c => {
@@ -236,7 +246,7 @@
           loadAnalytics();
         })
         .catch(err => {
-            showToast("Ошибка загрузки конфига: " + err, true);
+            showToast("Ошибка Config: " + err, true);
             document.getElementById('loader').style.display='none';
         });
       }
