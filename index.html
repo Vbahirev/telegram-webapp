@@ -269,8 +269,8 @@
 
     <script>
       // ===============================================
-      // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzX6eSG_Y5KUINgoZJeS-2rSuHy525f7quddoDQIfFNtkg6WvNW8xMMBk1WrgYPkYoD/exec';
+      // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyOXLAf-HuHP0G1lnN7RzC7vHv-EsFyqhQizOGIkVsk6m0KuG8NBwYs2wNHJpyDc5EM/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -280,7 +280,9 @@
       window.onload = () => { 
         if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
         document.getElementById('loader').style.display='flex'; 
+        
         loadConfig(); 
+        
         document.getElementById('formEntry').onsubmit=saveEntry;
         document.getElementById('formRef').onsubmit=addRef; 
         document.getElementById('searchInp').oninput=smartSearch; 
@@ -291,8 +293,10 @@
         }
       };
 
+      // --- УНИВЕРСАЛЬНЫЙ МОСТ (БЕЗ ПРОКСИ - ИЗ ВАШЕГО ФАЙЛА) ---
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
+             // Режим: Внутри Google Таблицы
              return new Promise((resolve, reject) => {
                  if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
@@ -300,6 +304,7 @@
                  else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(payload.city, payload.items);
                  else if(action === 'addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(payload.name, payload.price, payload.cat);
                  else if(action === 'getAnalyticsData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAnalyticsData(payload.period, payload.mIdx, payload.yr, payload.city);
+                 // НОВЫЕ МЕТОДЫ (РЕДАКТИРОВАНИЕ)
                  else if(action === 'updateOrderRow') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).updateLineItem(payload.city, payload.rowIndex, payload.name, payload.qty);
                  else if(action === 'deleteLineItem') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).deleteLineItem(payload.city, payload.rowIndex);
                  else if(action === 'updateProductRow') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).updateProductRow(payload.rowIndex, payload.name, payload.price, payload.cat);
@@ -307,14 +312,32 @@
                  else reject("Unknown Func");
              });
          } else {
-             if(GAS_URL.includes("ВАШ_")) throw new Error("No URL");
+             // Режим: Telegram / Web (POST запрос text/plain)
+             if(GAS_URL.includes("ВАШ_")) {
+                alert("ОШИБКА: Вставь ссылку в код Dashboard.html!");
+                throw new Error("No URL");
+             }
+             
              payload.action = action;
              try {
                  const res = await fetch(GAS_URL, {
-                     method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
+                     method: "POST",
+                     // Хитрость: text/plain не вызывает preflight CORS
+                     headers: { "Content-Type": "text/plain;charset=utf-8" },
+                     body: JSON.stringify(payload)
                  });
-                 return JSON.parse(await res.text());
-             } catch(e) { throw e; }
+                 const text = await res.text();
+                 try {
+                    return JSON.parse(text);
+                 } catch(e) {
+                    console.error("Server HTML:", text);
+                    // Если вернулся HTML, значит проблема с доступом
+                    if(text.includes("<!DOCTYPE")) throw new Error("Ошибка доступа! Проверь Deploy: 'Anyone'");
+                    throw new Error("Server Error: " + text);
+                 }
+             } catch(e) {
+                 throw e;
+             }
          }
       }
 
@@ -505,7 +528,7 @@
         const g = d.prevRev > 0 ? ((d.totalRev - d.prevRev)/d.prevRev)*100 : 0; 
         document.getElementById('kpi').innerHTML=`<div class="card"><div class="card-lbl">Выручка</div><div class="card-val" style="color:var(--accent)">${d.totalRev.toLocaleString()} ₽</div><div class="trend-badge ${g>=0?'trend-up':'trend-down'}">${g>=0?'↑':'↓'} ${Math.abs(g).toFixed(1)}%</div><div class="sub-text">Прошлый: ${d.prevRev.toLocaleString()} ₽</div></div><div class="card"><div class="card-lbl">В ожидании</div><div class="card-val" style="color:#f59e0b">${d.pend.toLocaleString()} ₽</div><div class="sub-text">Это <b>${(d.totalRev+d.pend)>0?((d.pend/(d.totalRev+d.pend))*100).toFixed(1):0}%</b> от всего объема</div></div><div class="card"><div class="card-lbl">Заказы</div><div class="card-val">${d.count}</div><div class="sub-text">Успешных сделок</div></div><div class="card"><div class="card-lbl">Ср. Чек</div><div class="card-val" style="color:var(--success)">${d.avg.toLocaleString()} ₽</div></div>`; 
         const th=document.body.getAttribute('data-theme'), c=th==='dark'?'#cbd5e1':'#64748b', gr=th==='dark'?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)'; 
-        renderChart('chartTrend', 'bar', {labels:d.trendL, datasets:[{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]}, {scales:{x:{grid:{display:false},ticks:{color:c}},y:{grid:{color:gr},ticks:{color:c}}}}); 
+        renderChart('chartTrend', 'bar', {labels:d.trendL, datasets:[{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]}, {scales:{x:{grid:{display:false},ticks:{color:c}},y:{grid:{color:grid},ticks:{color:c}}}}); 
         renderChart('chartCity', 'doughnut', {labels:d.cityStats?Object.keys(d.cityStats):[], datasets:[{data:d.cityStats?Object.values(d.cityStats):[], backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6'], borderWidth:0}]}, {plugins:{legend:{position:'right',labels:{color:c,font:{size:11},boxWidth:12}}}}); 
         renderChart('chartCat', 'bar', {labels:Object.keys(d.catStats), datasets:[{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]}, {indexAxis:'y', scales:{x:{grid:{color:gr},ticks:{color:c}},y:{grid:{display:false},ticks:{color:c}}}}); 
         
