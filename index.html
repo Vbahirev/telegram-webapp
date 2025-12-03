@@ -692,57 +692,102 @@
          r.style.display = txt.toLowerCase().includes(v) ? '' : 'none';
       })}
       
-      // === ИСПРАВЛЕННЫЕ ГРАФИКИ (АДАПТИВНОСТЬ) ===
+      // ИСПРАВЛЕННАЯ ФУНКЦИЯ drawAnalytics
+      // 1. Столбцы тоньше, текст по диагонали.
+      // 2. Группировка данных (Топ-5/Топ-8), чтобы графики влезали в экран.
       function drawAnalytics(d) { 
         LAST_DATA = d;
         const g = d.prevRev > 0 ? ((d.totalRev - d.prevRev)/d.prevRev)*100 : 0;
         
-        // 1. KPI карточки
+        // --- 1. KPI (Без изменений) ---
         document.getElementById('kpi').innerHTML=`<div class="card"><div class="card-lbl">Выручка</div><div class="card-val" style="color:var(--accent)">${d.totalRev.toLocaleString()} ₽</div><div class="trend-badge ${g>=0?'trend-up':'trend-down'}">${g>=0?'↑':'↓'} ${Math.abs(g).toFixed(1)}%</div><div class="sub-text">Прошлый: ${d.prevRev.toLocaleString()} ₽</div></div><div class="card"><div class="card-lbl">В ожидании</div><div class="card-val" style="color:#f59e0b">${d.pend.toLocaleString()} ₽</div><div class="sub-text">Это <b>${(d.totalRev+d.pend)>0?((d.pend/(d.totalRev+d.pend))*100).toFixed(1):0}%</b> от всего объема</div></div><div class="card"><div class="card-lbl">Заказы</div><div class="card-val">${d.count}</div><div class="sub-text">Успешных сделок</div></div><div class="card"><div class="card-lbl">Ср. Чек</div><div class="card-val" style="color:var(--success)">${d.avg.toLocaleString()} ₽</div></div>`; 
         
-        // Цвета темы
         const th=document.body.getAttribute('data-theme');
         const c=th==='dark'?'#cbd5e1':'#64748b';
         const gridColor=th==='dark'?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)';
-        
-        // Проверка мобильного устройства
         const isMobile = window.innerWidth < 768;
 
-        // 2. График Тренда (Bar) - Добавлен autoSkip и maintainAspectRatio
+        // --- 2. ГРАФИК ВЫРУЧКИ (ТОНЬШЕ + ДИАГОНАЛЬ) ---
         renderChart('chartTrend', 'bar', {
             labels: d.trendL, 
-            datasets: [{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]
+            datasets: [{
+                label: 'Выручка', 
+                data: d.trendD, 
+                backgroundColor: '#3b82f6', 
+                borderRadius: 4,
+                barPercentage: 0.6, // Делаем столбики тоньше (сплющиваем)
+                categoryPercentage: 0.8
+            }]
         }, {
             maintainAspectRatio: false, 
             scales: {
-                x: { grid:{display:false}, ticks:{color:c, maxRotation: 0, autoSkip: true} }, 
+                x: { 
+                    grid: { display:false }, 
+                    ticks: {
+                        color: c, 
+                        autoSkip: true,
+                        maxRotation: 45, // Поворот текста по диагонали
+                        minRotation: 45  // Фиксируем поворот
+                    } 
+                }, 
                 y: { grid:{color:gridColor}, ticks:{color:c} }
             }
         }); 
 
-        // 3. График Городов (Doughnut) - Легенда снизу на телефоне
+        // --- 3. ГРУППИРОВКА ГОРОДОВ (ТОП-5 + ДРУГИЕ) ---
+        // Это "поджимает" график данных, чтобы легенда не была огромной
+        let cityLabels = [], cityData = [];
+        if(d.cityStats) {
+            const sorted = Object.entries(d.cityStats).sort((a,b) => b[1] - a[1]);
+            const top = sorted.slice(0, 5); // Берем только 5 лидеров
+            const others = sorted.slice(5).reduce((acc, curr) => acc + curr[1], 0);
+
+            cityLabels = top.map(x => x[0]);
+            cityData = top.map(x => x[1]);
+            
+            if (others > 0) {
+                cityLabels.push('Другие');
+                cityData.push(others);
+            }
+        }
+
         renderChart('chartCity', 'doughnut', {
-            labels: d.cityStats ? Object.keys(d.cityStats) : [], 
+            labels: cityLabels, 
             datasets: [{
-                data: d.cityStats ? Object.values(d.cityStats) : [], 
+                data: cityData, 
                 backgroundColor: ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6'], 
                 borderWidth: 0
             }]
         }, {
             maintainAspectRatio: false, 
-            layout: { padding: { bottom: 10 } }, 
+            layout: { padding: { bottom: 5, top: 5 } }, // Минимальные отступы
             plugins: {
                 legend: {
-                    position: isMobile ? 'bottom' : 'right',
-                    labels: { color:c, font:{size:11}, boxWidth:12, padding: 15 }
+                    position: isMobile ? 'bottom' : 'right', // Легенда снизу на телефоне
+                    labels: { color:c, font:{size:11}, boxWidth:12, padding: 10 }
                 }
             }
         });
 
-        // 4. График Категорий
+        // --- 4. ГРУППИРОВКА КАТЕГОРИЙ (ТОП-8 + ДРУГИЕ) ---
+        let catLabels = [], catData = [];
+        if(d.catStats) {
+             const sorted = Object.entries(d.catStats).sort((a,b) => b[1] - a[1]);
+             const top = sorted.slice(0, 8); // Только 8 категорий
+             const others = sorted.slice(8).reduce((acc, curr) => acc + curr[1], 0);
+
+             catLabels = top.map(x => x[0]);
+             catData = top.map(x => x[1]);
+
+             if (others > 0) {
+                 catLabels.push('Другие');
+                 catData.push(others);
+             }
+        }
+
         renderChart('chartCat', 'bar', {
-            labels: Object.keys(d.catStats), 
-            datasets: [{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]
+            labels: catLabels, 
+            datasets: [{label:'Продажи', data:catData, backgroundColor:'#8b5cf6', borderRadius:4}]
         }, {
             indexAxis: 'y', 
             maintainAspectRatio: false,
@@ -752,7 +797,7 @@
             }
         }); 
         
-        // 5. Топ таблица
+        // --- 5. ТАБЛИЦА ТОП (Без изменений) ---
         const tb = document.querySelector('#topTable tbody'); tb.innerHTML = '';
         if (d.top) d.top.forEach(x => { 
            const tr=document.createElement('tr'); 
@@ -760,7 +805,6 @@
            tb.appendChild(tr); 
         });
       }
-
       function renderChart(id, type, data, opts) { if(CHARTS[id]) CHARTS[id].destroy(); const ctx = document.getElementById(id).getContext('2d');
         const d={ maintainAspectRatio:false, plugins:{legend:{display:false}} }; CHARTS[id] = new Chart(ctx, { type:type, data:data, options:{...d, ...opts, plugins:{...d.plugins, ...opts.plugins}} });
       }
