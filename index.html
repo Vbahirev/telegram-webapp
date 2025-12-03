@@ -16,7 +16,6 @@
       body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); transition: 0.3s; height: 100vh; box-sizing: border-box; overflow: hidden; }
       .app-wrapper { display: flex; flex-direction: column; height: 100%; gap: 15px; max-width: 1400px; margin: 0 auto; width: 100%; }
       
-      /* --- HEADER & NAV --- */
       .header { display: flex; justify-content: space-between; align-items: center; }
       .title { margin: 0; font-size: 22px; font-weight: 800; }
       .nav { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -26,7 +25,6 @@
       .tab-page { display: none; height: 100%; overflow-y: auto; padding: 30px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
       .tab-page.active { display: block; }
 
-      /* --- INPUTS & CONTROLS --- */
       label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; }
       input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box; }
       input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
@@ -38,14 +36,12 @@
       .btn:disabled { opacity: 0.6; cursor: not-allowed; }
       .btn-sm { width: auto; padding: 8px 16px; font-size: 13px; border-radius: 8px; }
 
-      /* Кнопки действий */
       .btn-action { padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; min-width: 80px; }
       .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid transparent; }
       .btn-danger:hover { background: var(--danger); color: white; }
       .btn-save { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid transparent; }
       .btn-save:hover { background: var(--success); color: white; }
 
-      /* --- TABLE & LISTS --- */
       .responsive-table-wrapper { border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; background: var(--bg-panel); }
       table { width: 100%; border-collapse: collapse; font-size: 13px; }
       th { text-align: left; padding: 15px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--input-bg); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
@@ -57,7 +53,6 @@
       .tbl-input { width: 100%; border: 1px solid transparent; background: transparent; font-weight: 500; padding: 8px; border-radius: 6px; transition: 0.2s; font-size:13px; }
       .tbl-input:focus, .tbl-input:hover { border-color: var(--border); background: var(--input-bg); }
 
-      /* --- TABLE BOX (ANALYTICS) --- */
       .table-box { background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border); height: 300px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
       .table-box-header { padding: 15px; font-size: 14px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--input-bg); flex-shrink: 0; }
       .table-box-scroll { overflow-y: auto; flex: 1; padding: 0; }
@@ -66,7 +61,6 @@
       .analytics-table td { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 13px; }
       .analytics-table tr:last-child td { border-bottom: none; }
 
-      /* --- ANALYTICS & GRID --- */
       .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
       .card { background: var(--card-kpi-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; }
       .card-val { font-size: 24px; font-weight: 800; margin-top: 5px; color: var(--accent); }
@@ -77,12 +71,10 @@
       .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
       .chart-box { background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); height: 300px; position: relative; }
       
-      /* --- MODALS & LOADERS --- */
       .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; display: none; backdrop-filter: blur(4px); flex-direction: column; color: white; font-weight: 600; }
       .spin { width: 30px; height: 30px; border: 3px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: r 1s infinite linear; margin-bottom: 10px; }
       @keyframes r { to { transform: rotate(360deg); } }
 
-      /* CONFIRM MODAL */
       .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
       .modal-box { background: var(--bg-panel); padding: 25px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s; }
       .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
@@ -107,7 +99,6 @@
       .theme-toggle { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); padding: 5px; transition: 0.2s; }
       .theme-toggle:hover { transform: scale(1.1); }
 
-      /* --- MOBILE ADAPTATION --- */
       @media (max-width: 768px) {
         body { padding: 10px; height: auto; overflow: auto; }
         .app-wrapper { height: auto; min-height: 100vh; }
@@ -270,7 +261,7 @@
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyOXLAf-HuHP0G1lnN7RzC7vHv-EsFyqhQizOGIkVsk6m0KuG8NBwYs2wNHJpyDc5EM/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyuAOtuZzDU4A6pm-Pt_xqHHu2ngNBXKgxHwVeF2MMyyQUZ3P3DLFi4r6Zaq_fxVbXT/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -293,10 +284,9 @@
         }
       };
 
-      // --- УНИВЕРСАЛЬНЫЙ МОСТ (БЕЗ ПРОКСИ - ИЗ ВАШЕГО ФАЙЛА) ---
+      // ВАЖНО: Используем вашу функцию из Dashboard.txt для обхода блокировок
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
-             // Режим: Внутри Google Таблицы
              return new Promise((resolve, reject) => {
                  if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
@@ -304,7 +294,6 @@
                  else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(payload.city, payload.items);
                  else if(action === 'addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(payload.name, payload.price, payload.cat);
                  else if(action === 'getAnalyticsData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAnalyticsData(payload.period, payload.mIdx, payload.yr, payload.city);
-                 // НОВЫЕ МЕТОДЫ (РЕДАКТИРОВАНИЕ)
                  else if(action === 'updateOrderRow') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).updateLineItem(payload.city, payload.rowIndex, payload.name, payload.qty);
                  else if(action === 'deleteLineItem') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).deleteLineItem(payload.city, payload.rowIndex);
                  else if(action === 'updateProductRow') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).updateProductRow(payload.rowIndex, payload.name, payload.price, payload.cat);
@@ -312,7 +301,6 @@
                  else reject("Unknown Func");
              });
          } else {
-             // Режим: Telegram / Web (POST запрос text/plain)
              if(GAS_URL.includes("ВАШ_")) {
                 alert("ОШИБКА: Вставь ссылку в код Dashboard.html!");
                 throw new Error("No URL");
@@ -322,7 +310,6 @@
              try {
                  const res = await fetch(GAS_URL, {
                      method: "POST",
-                     // Хитрость: text/plain не вызывает preflight CORS
                      headers: { "Content-Type": "text/plain;charset=utf-8" },
                      body: JSON.stringify(payload)
                  });
@@ -331,7 +318,6 @@
                     return JSON.parse(text);
                  } catch(e) {
                     console.error("Server HTML:", text);
-                    // Если вернулся HTML, значит проблема с доступом
                     if(text.includes("<!DOCTYPE")) throw new Error("Ошибка доступа! Проверь Deploy: 'Anyone'");
                     throw new Error("Server Error: " + text);
                  }
@@ -369,7 +355,6 @@
         .catch(err => { showToast("Ошибка Config: " + err, true); document.getElementById('loader').style.display='none'; });
       }
 
-      // --- ОТГРУЗКА ---
       function loadUnshippedTable(){
         const c=document.getElementById('shipCity').value, d=document.getElementById('unshippedContent');
         if(!c)return;
@@ -414,7 +399,6 @@
         .catch(err => d.innerHTML = "Ошибка: " + err);
       }
 
-      // --- СПРАВОЧНИК ---
       function fillRefTable(d){
         const t = document.querySelector('#refTable tbody');
         t.innerHTML='';
@@ -434,7 +418,6 @@
         });
       }
 
-      // --- MODAL ---
       function showConfirm(callback) {
           deleteCallback = callback;
           document.getElementById('confirmModal').style.display = 'flex';
@@ -448,7 +431,6 @@
           deleteCallback = null;
       }
 
-      // --- ACTIONS ---
       function showSaveBtn(idx) { document.getElementById(`btn-save-${idx}`).style.display = 'inline-flex'; }
       function saveRow(city, rowIndex, localIdx) {
          const btn = document.getElementById(`btn-save-${localIdx}`);
@@ -483,7 +465,6 @@
          });
       }
 
-      // --- SYSTEM ---
       function saveEntry(e){ e.preventDefault(); const b=document.getElementById('saveBtn'); const t=b.innerText; b.disabled=true; b.innerText='⏳...';
         runBackend('saveNewEntry', { city: document.getElementById('entryCity').value, productName: document.getElementById('searchInp').value, quantity: document.getElementById('qty').value })
         .then(r => { showToast(r.message, !r.success); b.disabled=false; b.innerText=t; if(r.success){ document.getElementById('searchInp').value=''; document.getElementById('qty').value=1; calcTotal(); }})
@@ -532,7 +513,6 @@
         renderChart('chartCity', 'doughnut', {labels:d.cityStats?Object.keys(d.cityStats):[], datasets:[{data:d.cityStats?Object.values(d.cityStats):[], backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6'], borderWidth:0}]}, {plugins:{legend:{position:'right',labels:{color:c,font:{size:11},boxWidth:12}}}}); 
         renderChart('chartCat', 'bar', {labels:Object.keys(d.catStats), datasets:[{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]}, {indexAxis:'y', scales:{x:{grid:{color:gr},ticks:{color:c}},y:{grid:{display:false},ticks:{color:c}}}}); 
         
-        // TABLE UPDATE
         const tb = document.querySelector('#topTable tbody'); tb.innerHTML = ''; 
         if (d.top) d.top.forEach(x => { 
            const tr=document.createElement('tr'); 
