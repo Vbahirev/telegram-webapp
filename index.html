@@ -2,60 +2,70 @@
 <html>
   <head>
     <base target="_top">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CRM Manager</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-      /* ВАШ ОРИГИНАЛЬНЫЙ СТИЛЬ ИЗ ФАЙЛА DASHBOARD.TXT */
-      :root { --bg-app: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --accent: #3b82f6; --border: #cbd5e1; --input-bg: #ffffff; --success: #10b981; --danger: #ef4444; --card-kpi-bg: #ffffff; --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
-      [data-theme="dark"] { --bg-app: #0f172a; --bg-panel: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; --accent: #60a5fa; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b; --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
+      :root {
+        --bg-app: #f8fafc;
+        --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
+        --accent: #3b82f6; --border: #cbd5e1; --input-bg: #ffffff;
+        --success: #10b981; --danger: #ef4444; --card-kpi-bg: #ffffff;
+        --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      }
+      [data-theme="dark"] {
+        --bg-app: #0f172a; --bg-panel: #1e293b;
+        --text-main: #f8fafc; --text-sub: #94a3b8;
+        --accent: #60a5fa; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b;
+        --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      }
+      
       body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); transition: 0.3s; height: 100vh; box-sizing: border-box; overflow: hidden; }
       .app-wrapper { display: flex; flex-direction: column; height: 100%; gap: 15px; max-width: 1200px; margin: 0 auto; width: 100%; }
+      
       .toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-app); text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s; }
       .toast.show { visibility: visible; opacity: 1; bottom: 50px; }
-      .toast.success { background-color: var(--success); color: white; }
       .toast.error { background-color: var(--danger); color: white; }
+      .toast.success { background-color: var(--success); color: white; }
+      
       .header { display: flex; justify-content: space-between; align-items: center; }
       .title { margin: 0; font-size: 22px; font-weight: 800; }
       .nav { display: flex; gap: 8px; flex-wrap: wrap; }
       .nav-btn { padding: 10px 18px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-sub); border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; white-space: nowrap; }
       .nav-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-      .nav-btn:hover:not(.active) { opacity: 0.8; }
+      
       .content-area { flex: 1; position: relative; overflow: hidden; background-color: var(--bg-panel); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); z-index: 10; }
       .tab-page { display: none; height: 100%; overflow-y: auto; padding: 30px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
       .tab-page.active { display: block; }
+      
       label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; }
-      input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; font-weight: 500; outline: none; box-sizing: border-box; transition: 0.2s; }
-      @media screen and (max-width: 768px) { input, select { font-size: 16px; } }
+      input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box; }
       input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-      select { appearance: none; -webkit-appearance: none; background-image: var(--arrow-icon); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; cursor: pointer; }
-      select option { background-color: var(--bg-panel); color: var(--text-main); }
-      .select-wrapper-highlight { position: relative; flex: 1; width: 100%; min-width: 200px; }
-      .select-wrapper-highlight::after { content: ''; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-top-color: var(--accent); pointer-events: none; margin-top: 3px; }
-      select.highlight-select { border: 2px solid var(--accent); background-color: var(--bg-panel); font-weight: 700; width: 100%; }
-      select.highlight-select:hover { background-color: var(--input-bg); }
+      select { appearance: none; -webkit-appearance: none; background-image: var(--arrow-icon); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
+      
       .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
-      .qty-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-      .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; -webkit-tap-highlight-color: transparent; }
-      .qty-input, #newPPrice { -moz-appearance: textfield; }
-      .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button, #newPPrice::-webkit-outer-spin-button, #newPPrice::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-      .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; padding: 0; height: 100%; }
-      .qty-input:focus { border: none; box-shadow: none; }
-      .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-      .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+      .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
+      .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
+      
+      .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
       .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      .btn-sm { width: auto; padding: 8px 20px; font-size: 13px; white-space: nowrap; }
+      .btn-sm { width: auto; padding: 8px 20px; font-size: 13px; }
+      
       table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      th { text-align: left; padding: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--input-bg); white-space: nowrap; }
+      th { text-align: left; padding: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--input-bg); }
       td { padding: 12px; border-bottom: 1px solid var(--border); }
       .w-check { width: 40px; text-align: center; }
-      .w-check input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); vertical-align: middle;}
+      .w-check input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); vertical-align: middle; }
+      
       .search-box { position: relative; }
       .results-list { position: absolute; top: 105%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--bg-panel); border: 2px solid var(--accent); border-radius: 10px; z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
       .res-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
       .res-item:hover { background: var(--input-bg); color: var(--accent); }
+      
       .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
       .card { background: var(--card-kpi-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; }
       .card-val { font-size: 24px; font-weight: 800; margin-top: 5px; color: var(--accent); }
@@ -63,17 +73,26 @@
       .trend-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-top: 8px; width: fit-content; }
       .trend-up { background: rgba(16, 185, 129, 0.15); color: var(--success); }
       .trend-down { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-      .sub-text { font-size: 11px; color: var(--text-sub); margin-top: 4px; opacity: 0.8; }
+      
       .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
       .chart-box { background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); height: 300px; position: relative; }
       .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-sub); text-transform: uppercase; }
       .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
       .table-box { height: 300px; overflow-y: auto; background: var(--card-kpi-bg); border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
+
       .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; display: none; backdrop-filter: blur(4px); flex-direction: column; color: white; font-weight: 600; }
       .spin { width: 30px; height: 30px; border: 3px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: r 1s infinite linear; margin-bottom: 10px; }
       @keyframes r { to { transform: rotate(360deg); } }
       .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-main); }
-      @media (max-width: 768px) { body { padding: 10px; height: auto; overflow: auto; } .app-wrapper { height: auto; min-height: 100vh; } .content-area { border-radius: 12px; height: auto; overflow: visible; } .tab-page { padding: 15px; height: auto; overflow: visible; } .nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; } .nav-btn { padding: 10px 15px; font-size: 13px; } #formEntry > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; } #Ref > div { grid-template-columns: 1fr !important; gap: 20px !important; } .kpi-row { grid-template-columns: 1fr 1fr; } .charts-grid, .bottom-grid { grid-template-columns: 1fr; } #Analytics > div:first-child select { width: 100% !important; margin-bottom: 5px; } #Analytics > div:first-child { flex-direction: column; gap: 5px; } #Analytics > div:first-child button { width: 100%; } .table-box, #refTable, #unshippedContent > div { overflow-x: auto; } .title { font-size: 18px; } }
+      
+      @media (max-width: 768px) {
+        body { padding: 10px; height: auto; overflow: auto; }
+        .app-wrapper { height: auto; min-height: 100vh; }
+        .content-area, .tab-page { overflow: visible; height: auto; padding: 15px; }
+        .nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+        .kpi-row { grid-template-columns: 1fr 1fr; }
+        .charts-grid, .bottom-grid { grid-template-columns: 1fr; }
+      }
       @media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr; } }
     </style>
   </head>
@@ -82,20 +101,29 @@
     <div class="loader" id="loader"><div class="spin"></div><div id="loaderTxt">Загрузка...</div></div>
 
     <div class="app-wrapper">
-      <div class="header"><h1 class="title">CRM <span style="color:var(--accent)">Менеджер</span></h1><button class="theme-toggle" onclick="toggleTheme()">🌗</button></div>
+      <div class="header">
+        <h1 class="title">CRM <span style="color:var(--accent)">Менеджер</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">🌗</button>
+      </div>
       <div class="nav">
         <button class="nav-btn active" onclick="tab('Entry')">➕ Ввод</button>
         <button class="nav-btn" onclick="tab('Unshipped')">📦 Отгрузка</button>
         <button class="nav-btn" onclick="tab('Ref')">📚 Справочник</button>
         <button class="nav-btn" onclick="tab('Analytics')">📊 Аналитика</button>
       </div>
+  
       <div class="content-area">
         <div id="Entry" class="tab-page active">
            <div style="max-width: 500px; margin: 0 auto;">
              <h3>Новая запись</h3>
              <form id="formEntry">
                <div style="margin-bottom: 15px;"><label>Город (Магазин)</label><select id="entryCity" required></select></div>
-               <div class="search-box" style="margin-bottom: 15px;"><label>Поиск товара</label><input type="text" id="searchInp" placeholder="Начните вводить..." autocomplete="off" required><div class="results-list" id="resList"></div><input type="hidden" id="prodName"></div>
+               <div class="search-box" style="margin-bottom: 15px;">
+                 <label>Поиск товара</label>
+                 <input type="text" id="searchInp" placeholder="Начните вводить..." autocomplete="off" required>
+                 <div class="results-list" id="resList"></div>
+                 <input type="hidden" id="prodName">
+               </div>
                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                  <div><label>Количество</label><div class="qty-wrapper"><button type="button" class="qty-btn" onclick="changeQty(-1)">−</button><input type="number" id="qty" value="1" min="1" class="qty-input" required><button type="button" class="qty-btn" onclick="changeQty(1)">+</button></div></div>
                  <div><label>Итого</label><div id="totalPreview" style="padding: 12px; font-weight: 700; color: var(--accent); font-size:18px;">0 ₽</div></div>
@@ -104,16 +132,18 @@
              </form>
            </div>
         </div>
+        
         <div id="Unshipped" class="tab-page">
            <div style="background: var(--input-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
              <label style="font-size:13px; margin-bottom:10px;">ВЫБЕРИТЕ ГОРОД ДЛЯ ОТГРУЗКИ:</label>
              <div style="display:flex; gap: 15px; align-items: center; width: 100%; flex-wrap: wrap;">
-               <div class="select-wrapper-highlight"><select id="shipCity" class="highlight-select" onchange="loadUnshippedTable()"></select></div>
+               <div style="flex:1; width:100%"><select id="shipCity" onchange="loadUnshippedTable()"></select></div>
                <button class="btn btn-sm" style="width: auto; white-space: nowrap; flex-grow: 1;" onclick="loadUnshippedTable()">Обновить</button>
              </div>
            </div>
            <div id="unshippedContent"><div style="text-align:center; color:var(--text-sub); margin-top: 50px;"><div style="font-size: 40px; margin-bottom:10px;">🏪</div>Выберите город выше</div></div>
         </div>
+
         <div id="Ref" class="tab-page">
            <div style="display:grid; grid-template-columns: 300px 1fr; gap: 30px;">
              <div style="background: var(--bg-panel); padding: 20px; border-radius: 12px; height: fit-content; border: 1px solid var(--border);">
@@ -128,6 +158,7 @@
              <div><input type="text" id="filterRef" placeholder="🔍 Фильтр..." onkeyup="filterRef()" style="margin-bottom: 10px;"><div style="max-height: 500px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px;"><table id="refTable"><thead><tr><th>Товар</th><th>Категория</th><th>Цена</th></tr></thead><tbody></tbody></table></div></div>
            </div>
         </div>
+
         <div id="Analytics" class="tab-page">
            <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap: wrap;">
              <select id="anYear" style="width:120px" onchange="loadAnalytics()"></select>
@@ -149,194 +180,239 @@
     </div>
 
     <script>
-      let CONFIG = {}, PRODUCTS = [], CHARTS = {};
-      let LAST_DATA = null; 
-      
       // ===============================================
-      // 👇 ВСТАВЬТЕ СЮДА ВАШУ НОВУЮ ССЫЛКУ ИЗ GOOGLE
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOm3iB2FO8R5lAKyFlckMM59_lFzykSvwjdXhGtHzeuWBddmBvAL1gisn3FteQfa-O/exec';
+      // 👇 ВСТАВЬ СВОЮ ССЫЛКУ WEB APP (Exec) СЮДА
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbwuvJafctlQsFnt3XISWrFKiDQalRe-nNPphrWSD3UG-J7HIe5qlKXHMMi3drH6ysvf/exec';
       // ===============================================
 
-      const tg = window.Telegram.WebApp;
-      tg.expand();
-
-      // Проверка: где мы запущены?
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
+      let CONFIG = {}, PRODUCTS = [], CHARTS = {}, LAST_DATA = null; 
 
-      // === ЕДИНАЯ ФУНКЦИЯ ДЛЯ ОТПРАВКИ ДАННЫХ (HYBRID) ===
-      async function runBackend(action, data = {}) {
-        if (IS_GOOGLE) {
-           // Режим "Внутри Таблицы": используем google.script.run
-           return new Promise((resolve, reject) => {
-              const h = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
-              
-              if(action==='getInitialConfig') h.getInitialConfig();
-              else if(action==='saveNewEntry') h.saveNewEntry(data);
-              else if(action==='getUnshippedForCity') h.getUnshippedForCity(data.city);
-              else if(action==='shipAndGeneratePdf') h.shipAndGeneratePdf(data.city, data.items);
-              else if(action==='addNewProduct') h.addNewProduct(data.name, data.price, data.cat);
-              else if(action==='getAnalyticsData') h.getAnalyticsData(data.p, data.m, data.y, data.c);
-              else reject("Unknown action (Google Mode)");
-           });
-        } else {
-           // Режим "Телеграм": используем fetch через стабильный прокси AllOrigins
-           const targetUrl = new URL(GAS_URL);
-           targetUrl.searchParams.append('action', action);
-           targetUrl.searchParams.append('data', JSON.stringify(data));
-           if(data.city) targetUrl.searchParams.append('city', data.city); 
-
-           // Используем AllOrigins (он возвращает JSON, внутри которого ваши данные)
-           const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl.toString())}`;
-           
-           try {
-             const response = await fetch(proxy);
-             if (!response.ok) throw new Error("Ошибка сети: " + response.status);
-             
-             // AllOrigins возвращает объект { contents: "ВАШ_JSON_ОТВЕТ", status: ... }
-             const wrapper = await response.json();
-             
-             // Парсим внутренний JSON (который прислал Google)
-             return JSON.parse(wrapper.contents);
-
-           } catch (e) {
-             throw new Error("Ошибка связи: " + e.message);
-           }
-        }
-      }
-
+      // === ИНИЦИАЛИЗАЦИЯ ===
       window.onload = () => { 
+        if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
         document.getElementById('loader').style.display='flex'; 
+        
         loadConfig(); 
+        
         document.getElementById('formEntry').onsubmit=saveEntry; 
         document.getElementById('formRef').onsubmit=addRef; 
         document.getElementById('searchInp').oninput=smartSearch; 
         document.getElementById('qty').oninput=calcTotal; 
-        if(localStorage.getItem('crm_theme')==='dark') document.body.setAttribute('data-theme','dark'); 
+        if(localStorage.getItem('crm_theme')==='dark') document.body.setAttribute('data-theme','dark');
       };
 
-      function showToast(m,e=false){const x=document.getElementById("toast");x.innerText=m;x.className=e?"toast show error":"toast show success";setTimeout(()=>x.className=x.className.replace("show",""),3000);}
-      function changeQty(d){const e=document.getElementById('qty');let v=parseInt(e.value)||0;v+=d;if(v<1)v=1;e.value=v;calcTotal();}
-      
-      function base64ToBlob(base64) {
-        const binaryString = window.atob(base64);
-        const len = binaryString.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-        return new Blob([bytes], { type: 'application/pdf' });
+      // === УНИВЕРСАЛЬНАЯ ФУНКЦИЯ ЗАПРОСОВ (BACKEND BRIDGE) ===
+      async function runBackend(action, payload = {}) {
+         if (IS_GOOGLE) {
+             // Режим внутри Таблиц
+             return new Promise((resolve, reject) => {
+                 // Здесь мы имитируем роутер, вызывая функции напрямую, 
+                 // так как google.script.run вызывает серверные функции по имени
+                 if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
+                 else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
+                 else if(action === 'getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(payload.city);
+                 else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(payload.city, payload.items);
+                 else if(action === 'addNewProduct') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).addNewProduct(payload.name, payload.price, payload.cat);
+                 else if(action === 'getAnalyticsData') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getAnalyticsData(payload.period, payload.mIdx, payload.yr, payload.city);
+                 else reject("Unknown Func for Google Mode");
+             });
+         } else {
+             // Режим WEB / Telegram (через Proxy)
+             const target = new URL(GAS_URL);
+             target.searchParams.append('action', action);
+             // Передаем данные как JSON строку в параметре data
+             target.searchParams.append('data', JSON.stringify(payload));
+             
+             // Дополнительно для надежности дублируем city, если есть
+             if(payload.city) target.searchParams.append('city', payload.city);
+
+             const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(target.toString());
+             
+             try {
+                 const res = await fetch(proxyUrl);
+                 if(!res.ok) throw new Error("Network Error: " + res.status);
+                 const json = await res.json();
+                 return json;
+             } catch(e) {
+                 throw e;
+             }
+         }
       }
-      function closeLoader() { document.getElementById('loader').style.display = 'none'; }
 
-      // --- ЗАМЕНЯЕМ ПРЯМЫЕ ВЫЗОВЫ GOOGLE НА runBackend ---
+      // === ОСНОВНАЯ ЛОГИКА ===
 
-      async function loadConfig(){
-        try {
-          const c = await runBackend('getInitialConfig');
-          CONFIG = c; PRODUCTS = c.products; 
-          fillSel('entryCity', c.cities); 
-          const s=document.getElementById('shipCity'); s.innerHTML=''; s.add(new Option('Выберите город...','')); c.cities.forEach(x=>s.add(new Option(x,x))); 
-          fillSel('anCity', c.cities); 
+      function loadConfig(){
+        runBackend('getInitialConfig')
+        .then(c => {
+          CONFIG=c; PRODUCTS=c.products; 
+          fillSel('entryCity',c.cities); 
+          const s=document.getElementById('shipCity');s.innerHTML='';s.add(new Option('Выберите город...',''));c.cities.forEach(x=>s.add(new Option(x,x))); 
+          fillSel('anCity',c.cities); 
           fillRefTable(c.directoryData); 
           
           const dl=document.getElementById('catList');dl.innerHTML='';
           c.categories.forEach(x=>{const o=document.createElement('option');o.value=x;dl.appendChild(o)}); 
           
-          const m=document.getElementById('anMonth'); m.innerHTML = ''; m.add(new Option('Весь год', 'all')); 
-          c.months.forEach((x,i)=>m.add(new Option(x,i))); m.value = new Date().getMonth(); 
+          const m=document.getElementById('anMonth'); m.innerHTML = '';
+          m.add(new Option('Весь год', 'all')); 
+          c.months.forEach((x,i)=>m.add(new Option(x,i)));
+          m.value = new Date().getMonth(); 
 
           const ySel = document.getElementById('anYear'); ySel.innerHTML = '';
-          const currentY = new Date().getFullYear(); const availableYears = c.years || [currentY, currentY-1, currentY-2]; 
-          availableYears.forEach(y => ySel.add(new Option(y, y))); ySel.value = currentY;
+          const currentY = new Date().getFullYear();
+          const availableYears = c.years || [currentY, currentY-1]; 
+          availableYears.forEach(y => ySel.add(new Option(y, y)));
+          ySel.value = currentY;
 
           document.getElementById('loader').style.display='none'; 
           loadAnalytics();
-        } catch(e) {
-          document.getElementById('loaderTxt').innerText = "Ошибка: " + e;
-        }
+        })
+        .catch(err => {
+            showToast("Ошибка загрузки конфига: " + err, true);
+            document.getElementById('loader').style.display='none';
+        });
       }
 
-      function fillSel(id,a,p){const e=document.getElementById(id),s=e.value;e.innerHTML='';if(id==='anCity')e.add(new Option('Все города','All'));if(p)e.add(new Option(p,''));a.forEach(x=>e.add(new Option(x,x)));if(s&&Array.from(e.options).some(o=>o.value===s))e.value=s;}
-      function smartSearch(e){const v=e.target.value.toLowerCase(),l=document.getElementById('resList');l.innerHTML='';if(!v){l.style.display='none';return;}const m=PRODUCTS.filter(p=>p.name.toLowerCase().includes(v)).slice(8);if(m.length){l.style.display='block';m.forEach(p=>{const d=document.createElement('div');d.className='res-item';d.innerHTML=`<span><b>${p.name}</b> <small>(${p.category})</small></span><span>${p.price} ₽</span>`;d.onclick=()=>{document.getElementById('searchInp').value=p.name;document.getElementById('prodName').value=p.name;l.style.display='none';calcTotal()};l.appendChild(d)})}else{l.style.display='none'}}
-      function calcTotal(){const n=document.getElementById('searchInp').value,q=document.getElementById('qty').value,p=PRODUCTS.find(x=>x.name.toLowerCase()===n.toLowerCase()),pr=p?p.price:0;document.getElementById('totalPreview').innerText=(pr*q)+" ₽"}
-      
-      async function saveEntry(e){
-         e.preventDefault(); const b=document.getElementById('saveBtn'); b.disabled=true; b.innerText='⏳...';
-         try {
-           const r = await runBackend('saveNewEntry', {
-             city: document.getElementById('entryCity').value,
-             productName: document.getElementById('searchInp').value,
-             quantity: document.getElementById('qty').value
-           });
-           showToast(r.message, !r.success);
-           if(r.success) { document.getElementById('searchInp').value=''; document.getElementById('qty').value=1; calcTotal(); }
-         } catch(err) { showToast("Ошибка: "+err, true); }
-         finally { b.disabled=false; b.innerText='Сохранить'; }
-      }
-      
-      function toggleAll(source) { const checkboxes = document.querySelectorAll('.ship-chk'); checkboxes.forEach(cb => cb.checked = source.checked); }
+      function saveEntry(e){
+        e.preventDefault();
+        const b=document.getElementById('saveBtn'),t=b.innerText;
+        b.disabled=true; b.innerText='⏳...';
+        
+        const payload = {
+            city: document.getElementById('entryCity').value,
+            productName: document.getElementById('searchInp').value,
+            quantity: document.getElementById('qty').value
+        };
 
-      async function loadUnshippedTable(){
+        runBackend('saveNewEntry', payload)
+        .then(r => {
+            showToast(r.message, !r.success);
+            b.disabled=false; b.innerText=t;
+            if(r.success){
+                document.getElementById('searchInp').value='';
+                document.getElementById('qty').value=1;
+                calcTotal();
+            }
+        })
+        .catch(err => {
+            showToast("Ошибка: "+err, true);
+            b.disabled=false; b.innerText=t;
+        });
+      }
+
+      function loadUnshippedTable(){
         const c=document.getElementById('shipCity').value, d=document.getElementById('unshippedContent');
-        if(!c)return; d.innerHTML='<div style="text-align:center; padding:20px;">Загрузка...</div>'; 
-        try {
-           const i = await runBackend('getUnshippedForCity', {city: c});
-           if(!i.length){d.innerHTML='<div style="text-align:center; padding:40px; opacity:0.7">Нет товаров к отгрузке! ✅</div>';return;}
-           const t=i.reduce((a,b)=>a+b.total,0);
-           d.dataset.items = JSON.stringify(i);
-           let h=`<div style="background:var(--input-bg); padding:15px; border-radius:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;"><span>Всего позиций: <b>${i.length}</b> | Сумма: <b>${t} ₽</b></span><button class="btn btn-sm" style="background:var(--success)" onclick="doShip('${c}')">📄 Создать накладную (PDF)</button></div><div style="max-height:450px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;"><table><thead><tr><th class="w-check"><input type="checkbox" onchange="toggleAll(this)" checked></th><th>Дата</th><th>Товар</th><th>Кол</th><th>Сумма</th></tr></thead><tbody>`;
-           i.forEach((x, index)=>{ h+=`<tr><td class="w-check"><input type="checkbox" class="ship-chk" data-idx="${index}" checked></td><td>${x.date}</td><td>${x.name}</td><td>${x.qty}</td><td>${x.total}</td></tr>` });
-           h+='</tbody></table></div>';
-           d.innerHTML=h;
-        } catch(e) { d.innerHTML="Ошибка: "+e; }
+        if(!c)return;
+        d.innerHTML='<div style="text-align:center; padding:20px;">Загрузка...</div>'; 
+        
+        runBackend('getUnshippedForCity', {city: c})
+        .then(i => {
+            if(!i.length){d.innerHTML='<div style="text-align:center; padding:40px; opacity:0.7">Нет товаров к отгрузке! ✅</div>';return;}
+            const t=i.reduce((a,b)=>a+b.total,0);
+            d.dataset.items = JSON.stringify(i);
+
+            let h=`<div style="background:var(--input-bg); padding:15px; border-radius:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;"><span>Всего: <b>${i.length}</b> | Сумма: <b>${t} ₽</b></span><button class="btn btn-sm" style="background:var(--success)" onclick="doShip('${c}')">📄 Накладная (PDF)</button></div>
+            <div style="max-height:450px; overflow-y:auto; border:1px solid var(--border); border-radius:10px;">
+            <table><thead><tr><th class="w-check"><input type="checkbox" onchange="toggleAll(this)" checked></th><th>Дата</th><th>Товар</th><th>Кол</th><th>Сумма</th></tr></thead><tbody>`;
+            i.forEach((x, index)=>{
+                h+=`<tr><td class="w-check"><input type="checkbox" class="ship-chk" data-idx="${index}" checked></td><td>${x.date}</td><td>${x.name}</td><td>${x.qty}</td><td>${x.total}</td></tr>`
+            });
+            h+='</tbody></table></div>';
+            d.innerHTML=h;
+        })
+        .catch(err => d.innerHTML = "Ошибка: " + err);
       }
-      
-      async function doShip(c){
+
+      function doShip(c){
         const d=document.getElementById('unshippedContent');
         if(!d.dataset.items) return; 
         const allItems=JSON.parse(d.dataset.items); 
         const checkboxes = document.querySelectorAll('.ship-chk:checked');
-        if (checkboxes.length === 0) { showToast("Выберите хотя бы одну позицию!", true); return; }
+        if (checkboxes.length === 0) { showToast("Выберите позиции!", true); return; }
+
         const selectedItems = [];
-        checkboxes.forEach(cb => { selectedItems.push(allItems[parseInt(cb.getAttribute('data-idx'))]); });
+        checkboxes.forEach(cb => selectedItems.push(allItems[parseInt(cb.getAttribute('data-idx'))]));
 
         const loader = document.getElementById('loader'), loaderTxt = document.getElementById('loaderTxt'), spinner = document.querySelector('.spin');
-        loader.style.display='flex'; spinner.style.display='block'; loaderTxt.innerHTML=`Генерация PDF (${selectedItems.length} поз.)...`;
-        
-        try {
-           const r = await runBackend('shipAndGeneratePdf', {city: c, items: selectedItems});
-           if(r.success){
+        loader.style.display='flex'; spinner.style.display='block'; 
+        loaderTxt.innerHTML=`Генерация PDF (${selectedItems.length} поз.)...`;
+
+        runBackend('shipAndGeneratePdf', { city: c, items: selectedItems })
+        .then(r => {
+            if(r.success){
                 const blob = base64ToBlob(r.pdfData);
                 const url = window.URL.createObjectURL(blob);
                 const fileName = `Накладная_${c}_${new Date().toLocaleDateString()}.pdf`;
+
                 spinner.style.display='none'; 
-                loaderTxt.innerHTML = `<div style="text-align:center"><div style="font-size:18px; margin-bottom:15px">Файл готов! ✅</div><div style="font-size:14px; margin-bottom:15px; opacity:0.8">Отгружено позиций: ${selectedItems.length}</div><a href="${url}" download="${fileName}" class="btn" style="background:#fff; color:var(--accent); display:block; margin-bottom:10px; text-decoration:none; padding:15px 30px;">⬇️ Скачать PDF</a><button class="btn btn-sm" onclick="closeLoader()" style="background:transparent; border:1px solid #fff;">Закрыть</button></div>`;
+                loaderTxt.innerHTML = `<div style="text-align:center"><div style="font-size:18px; margin-bottom:15px">Готово! ✅</div><a href="${url}" download="${fileName}" class="btn" style="background:#fff; color:var(--accent); display:block; margin-bottom:10px; text-decoration:none; padding:15px 30px;">⬇️ Скачать PDF</a><button class="btn btn-sm" onclick="closeLoader()" style="background:transparent; border:1px solid #fff;">Закрыть</button></div>`;
                 loadUnshippedTable();
-           } else { loader.style.display='none'; showToast(r.message, true); }
-        } catch(e) { loader.style.display='none'; showToast("Ошибка: " + e, true); }
+            } else {
+                loader.style.display='none'; showToast(r.message, true);
+            }
+        })
+        .catch(e => { loader.style.display='none'; showToast("Ошибка: " + e, true); });
       }
 
-      function fillRefTable(d){const t=document.querySelector('#refTable tbody');t.innerHTML='';d.forEach(x=>{const r=document.createElement('tr');r.innerHTML=`<td><b>${x.name}</b></td><td>${x.category}</td><td>${x.price} ₽</td>`;t.appendChild(r)})}
-      function filterRef(){const v=document.getElementById('filterRef').value.toLowerCase();document.querySelectorAll('#refTable tbody tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(v)?'':'none')}
-      
-      async function addRef(e){
-         e.preventDefault();const b=document.getElementById('productSubmitBtn'),t=b.innerText;b.disabled=true;b.innerText='⏳';
-         try {
-           const r = await runBackend('addNewProduct', {name:document.getElementById('newPName').value, price:document.getElementById('newPPrice').value, cat:document.getElementById('newPCat').value});
-           showToast(r.message,!r.success);
-           if(r.success){document.getElementById('newPName').value='';document.getElementById('newPPrice').value='';document.getElementById('newPCat').value='';loadConfig()}
-         } catch(err) { showToast("Error: "+err,true) }
-         finally { b.disabled=false;b.innerText=t; }
+      function addRef(e){
+        e.preventDefault();
+        const b=document.getElementById('productSubmitBtn'),t=b.innerText;
+        b.disabled=true; b.innerText='⏳';
+        
+        runBackend('addNewProduct', {
+            name: document.getElementById('newPName').value,
+            price: document.getElementById('newPPrice').value,
+            cat: document.getElementById('newPCat').value
+        })
+        .then(r => {
+            showToast(r.message, !r.success);
+            b.disabled=false; b.innerText=t;
+            if(r.success){
+                document.getElementById('newPName').value=''; document.getElementById('newPPrice').value=''; document.getElementById('newPCat').value='';
+                loadConfig(); // Обновляем справочники
+            }
+        })
+        .catch(err => { b.disabled=false; b.innerText=t; showToast("Error: " + err, true); });
       }
       
-      async function loadAnalytics(){
+      function loadAnalytics(){
         document.getElementById('loader').style.display = 'flex';
-        const y = document.getElementById('anYear').value; const mVal = document.getElementById('anMonth').value; const c = document.getElementById('anCity').value;
-        let p = 'month'; let m = mVal; if(mVal === 'all') { p = 'year'; m = 0; }
-        try {
-           const d = await runBackend('getAnalyticsData', {p:p,m:m,y:y,c:c});
-           drawAnalytics(d);
-        } catch(e) { document.getElementById('loader').style.display = 'none'; showToast("Ошибка загрузки: " + e, true); }
+        const y = document.getElementById('anYear').value;
+        const mVal = document.getElementById('anMonth').value;
+        const c = document.getElementById('anCity').value;
+        let p = 'month', m = mVal;
+        if(mVal === 'all') { p = 'year'; m = 0; }
+
+        runBackend('getAnalyticsData', { period: p, mIdx: m, yr: y, city: c })
+        .then(d => {
+            drawAnalytics(d);
+            document.getElementById('loader').style.display = 'none';
+        })
+        .catch(e => {
+            document.getElementById('loader').style.display = 'none';
+            showToast("Ошибка аналитики: " + e, true);
+        });
       }
 
+      // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (БЕЗ ИЗМЕНЕНИЙ UI) ===
+      function showToast(m,e=false){const x=document.getElementById("toast");x.innerText=m;x.className=e?"toast show error":"toast show success";setTimeout(()=>x.className=x.className.replace("show",""),3000);}
+      function changeQty(d){const e=document.getElementById('qty');let v=parseInt(e.value)||0;v+=d;if(v<1)v=1;e.value=v;calcTotal();}
+      function base64ToBlob(base64) {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+        return new Blob([bytes], { type: 'application/pdf' });
+      }
+      function closeLoader() { document.getElementById('loader').style.display = 'none'; }
+      function fillSel(id,a,p){const e=document.getElementById(id),s=e.value;e.innerHTML='';if(id==='anCity')e.add(new Option('Все города','All'));if(p)e.add(new Option(p,''));a.forEach(x=>e.add(new Option(x,x)));if(s&&Array.from(e.options).some(o=>o.value===s))e.value=s;}
+      function smartSearch(e){const v=e.target.value.toLowerCase(),l=document.getElementById('resList');l.innerHTML='';if(!v){l.style.display='none';return;}const m=PRODUCTS.filter(p=>p.name.toLowerCase().includes(v)).slice(0,10);if(m.length){l.style.display='block';m.forEach(p=>{const d=document.createElement('div');d.className='res-item';d.innerHTML=`<span><b>${p.name}</b> <small>(${p.category})</small></span><span>${p.price} ₽</span>`;d.onclick=()=>{document.getElementById('searchInp').value=p.name;document.getElementById('prodName').value=p.name;l.style.display='none';calcTotal()};l.appendChild(d)})}else{l.style.display='none'}}
+      function calcTotal(){const n=document.getElementById('searchInp').value,q=document.getElementById('qty').value,p=PRODUCTS.find(x=>x.name.toLowerCase()===n.toLowerCase()),pr=p?p.price:0;document.getElementById('totalPreview').innerText=(pr*q)+" ₽"}
+      function toggleAll(source) { document.querySelectorAll('.ship-chk').forEach(cb => cb.checked = source.checked); }
+      function filterRef(){const v=document.getElementById('filterRef').value.toLowerCase();document.querySelectorAll('#refTable tbody tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(v)?'':'none')}
+      function fillRefTable(d){const t=document.querySelector('#refTable tbody');t.innerHTML='';d.forEach(x=>{const r=document.createElement('tr');r.innerHTML=`<td><b>${x.name}</b></td><td>${x.category}</td><td>${x.price} ₽</td>`;t.appendChild(r)})}
+      
       function drawAnalytics(d) {
          LAST_DATA = d;
          const growth = d.prevRev > 0 ? ((d.totalRev - d.prevRev)/d.prevRev)*100 : 0;
@@ -355,7 +431,6 @@
          renderChart('chartCat', 'bar', {labels:catLabels, datasets:[{label:'Продажи', data:catData, backgroundColor:'#8b5cf6', borderRadius:4}]}, {indexAxis:'y', scales:{x:{grid:{color:grid},ticks:{color:color}},y:{grid:{display:false},ticks:{color:color}}}});
          const tb = document.querySelector('#topTable tbody'); tb.innerHTML = '';
          if (d.top) d.top.forEach(x => { const tr=document.createElement('tr'); tr.innerHTML=`<td>${x.name}</td><td><b>${x.val.toLocaleString()}</b></td>`; tb.appendChild(tr); });
-         document.getElementById('loader').style.display = 'none';
       }
       function renderChart(id, type, data, opts) {
          if(CHARTS[id]) CHARTS[id].destroy();
@@ -366,7 +441,6 @@
          CHARTS[id] = new Chart(ctx, { type:type, data:data, options:finalOpts });
       }
       function tab(i){document.querySelectorAll('.tab-page').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));document.getElementById(i).classList.add('active');event.target.classList.add('active');if(i==='Unshipped')loadUnshippedTable()}
-      
       function toggleTheme(){
           const b=document.body,d=b.getAttribute('data-theme')==='dark';
           b.setAttribute('data-theme',d?'light':'dark');
