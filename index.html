@@ -10,216 +10,97 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-      :root { --bg-app: #f8fafc;
-        --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --accent: #3b82f6; --accent-hover: #2563eb; --border: #cbd5e1; --input-bg: #ffffff; --success: #10b981; --danger: #ef4444; --danger-hover: #dc2626;
-        --card-kpi-bg: #ffffff; }
-      [data-theme="dark"] { --bg-app: #0f172a; --bg-panel: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; --accent: #60a5fa;
-        --accent-hover: #3b82f6; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b; }
+      :root { --bg-app: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --accent: #3b82f6; --accent-hover: #2563eb; --border: #cbd5e1; --input-bg: #ffffff; --success: #10b981; --danger: #ef4444; --danger-hover: #dc2626; --card-kpi-bg: #ffffff; }
+      [data-theme="dark"] { --bg-app: #0f172a; --bg-panel: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; --accent: #60a5fa; --accent-hover: #3b82f6; --border: #475569; --input-bg: #0f172a; --card-kpi-bg: #1e293b; }
       
-      body { margin: 0;
-        padding: 20px; font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); transition: 0.3s; height: 100vh; box-sizing: border-box; overflow: hidden;
-      }
-      .app-wrapper { display: flex; flex-direction: column; height: 100%; gap: 15px; max-width: 1400px;
-        margin: 0 auto; width: 100%; }
-      
-      .header { display: flex;
-        justify-content: space-between; align-items: center; }
-      .title { margin: 0; font-size: 22px; font-weight: 800;
-      }
-      .nav { display: flex; gap: 8px; flex-wrap: wrap;
-      }
-      .nav-btn { padding: 10px 18px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-sub);
-        border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; white-space: nowrap; }
-      .nav-btn.active { background: var(--accent);
-        color: white; border-color: var(--accent); }
-      .content-area { flex: 1; position: relative; overflow: hidden; background-color: var(--bg-panel);
-        border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); z-index: 10;
-      }
-      .tab-page { display: none; height: 100%; overflow-y: auto; padding: 30px; box-sizing: border-box; -webkit-overflow-scrolling: touch;
-      }
+      body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-main); transition: 0.3s; height: 100vh; box-sizing: border-box; overflow: hidden; }
+      .app-wrapper { display: flex; flex-direction: column; height: 100%; gap: 15px; max-width: 1400px; margin: 0 auto; width: 100%; }
+      .header { display: flex; justify-content: space-between; align-items: center; }
+      .title { margin: 0; font-size: 22px; font-weight: 800; }
+      .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+      .nav-btn { padding: 10px 18px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-sub); border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; white-space: nowrap; }
+      .nav-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+      .content-area { flex: 1; position: relative; overflow: hidden; background-color: var(--bg-panel); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); z-index: 10; }
+      .tab-page { display: none; height: 100%; overflow-y: auto; padding: 30px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
       .tab-page.active { display: block; }
-
-      label { font-size: 11px;
-        font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block;
-      }
-      input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border);
-        background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box;
-      }
-      input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-      }
-      input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0;
-      }
-      input[type="number"] { -moz-appearance: textfield;
-      }
-      
-      .btn { width: 100%; padding: 12px; background: var(--accent);
-        color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s;
-      }
+      label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 5px; display: block; }
+      input, select { width: 100%; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border); background-color: var(--input-bg); color: var(--text-main); font-family: 'Inter'; font-size: 14px; outline: none; box-sizing: border-box; }
+      input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+      input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+      input[type="number"] { -moz-appearance: textfield; }
+      .btn { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
       .btn:hover { background: var(--accent-hover); }
-      .btn:disabled { opacity: 0.6;
-        cursor: not-allowed; }
-      .btn-sm { width: auto; padding: 8px 16px; font-size: 13px; border-radius: 8px;
-      }
-
-      .btn-action { padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: 8px; border: none;
-        cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; min-width: 80px;
-      }
-      .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid transparent;
-      }
-      .btn-danger:hover { background: var(--danger); color: white;
-      }
-      .btn-save { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid transparent;
-      }
-      .btn-save:hover { background: var(--success); color: white;
-      }
-
-      .responsive-table-wrapper { border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; background: var(--bg-panel);
-      }
-      table { width: 100%; border-collapse: collapse; font-size: 13px;
-      }
-      th { text-align: left; padding: 15px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--input-bg);
-        font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-      td { padding: 12px 15px;
-        border-bottom: 1px solid var(--border); vertical-align: middle; }
-      
-      .w-check { width: 40px;
-        text-align: center; }
-      .w-check input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent);
-        vertical-align: middle; }
-      
-      .tbl-input { width: 100%;
-        border: 1px solid transparent; background: transparent; font-weight: 500; padding: 8px; border-radius: 6px; transition: 0.2s; font-size:13px;
-      }
-      .tbl-input:focus, .tbl-input:hover { border-color: var(--border); background: var(--input-bg);
-      }
-
-      .table-box { background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border); height: 300px; display: flex;
-        flex-direction: column; overflow: hidden; position: relative; }
-      .table-box-header { padding: 15px; font-size: 14px; font-weight: 700;
-        color: var(--text-sub); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--input-bg); flex-shrink: 0;
-      }
-      .table-box-scroll { overflow-y: auto; flex: 1; padding: 0;
-      }
-      .analytics-table { width: 100%; border-collapse: collapse;
-      }
-      .analytics-table th { position: sticky; top: 0; background: var(--input-bg); z-index: 5;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 12px 15px; font-size: 11px; color: var(--text-sub);
-      }
-      .analytics-table td { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 13px;
-      }
-      .analytics-table tr:last-child td { border-bottom: none;
-      }
-
-      .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;
-      }
-      .card { background: var(--card-kpi-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;
-      }
-      .card-val { font-size: 24px; font-weight: 800; margin-top: 5px; color: var(--accent);
-      }
-      .card-lbl { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase;
-      }
-      .trend-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
-        margin-top: 8px; width: fit-content; }
-      .trend-up { background: rgba(16, 185, 129, 0.15); color: var(--success);
-      }
-      .trend-down { background: rgba(239, 68, 68, 0.15); color: var(--danger);
-      }
-      .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;
-      }
-      .chart-box { background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); height: 300px;
-        position: relative; }
-      
-      .loader { position: fixed; top: 0;
-        left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; display: none; backdrop-filter: blur(4px);
-        flex-direction: column; color: white; font-weight: 600; }
-      .spin { width: 30px; height: 30px;
-        border: 3px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: r 1s infinite linear; margin-bottom: 10px;
-      }
-      @keyframes r { to { transform: rotate(360deg);
-      } }
-
-      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px);
-      }
-      .modal-box { background: var(--bg-panel); padding: 25px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center;
-        border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s;
-      }
-      .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 10px;
-      }
-      .modal-actions { display: flex; gap: 10px; margin-top: 20px;
-      }
-      .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;
-        border: none; font-size: 14px; }
-      .btn-confirm-yes { background: var(--danger); color: white;
-      }
-      .btn-confirm-no { background: var(--input-bg); border: 1px solid var(--border) !important; color: var(--text-main);
-      }
-
-      .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border);
-        border-radius: 10px; overflow: hidden; height: 46px; }
-      .qty-btn { width: 50px; height: 100%; background: transparent;
-        border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
-      .qty-input { width: 80px;
-        text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px;
-      }
-      
-      .toast { visibility: hidden; min-width: 250px; background-color: var(--text-main);
-        color: var(--bg-app); text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px;
-        font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s;
-      }
-      .toast.show { visibility: visible; opacity: 1; bottom: 50px;
-      }
-      .toast.error { background-color: var(--danger); color: white;
-      }
-      .toast.success { background-color: var(--success); color: white;
-      }
+      .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+      .btn-sm { width: auto; padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+      .btn-action { padding: 8px 14px; font-size: 13px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; min-width: 80px; }
+      .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid transparent; }
+      .btn-danger:hover { background: var(--danger); color: white; }
+      .btn-save { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid transparent; }
+      .btn-save:hover { background: var(--success); color: white; }
+      .responsive-table-wrapper { border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; background: var(--bg-panel); }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th { text-align: left; padding: 15px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--input-bg); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+      td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+      .w-check { width: 40px; text-align: center; }
+      .w-check input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); vertical-align: middle; }
+      .tbl-input { width: 100%; border: 1px solid transparent; background: transparent; font-weight: 500; padding: 8px; border-radius: 6px; transition: 0.2s; font-size:13px; }
+      .tbl-input:focus, .tbl-input:hover { border-color: var(--border); background: var(--input-bg); }
+      .table-box { background: var(--bg-panel); border-radius: 12px; border: 1px solid var(--border); height: 300px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+      .table-box-header { padding: 15px; font-size: 14px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--input-bg); flex-shrink: 0; }
+      .table-box-scroll { overflow-y: auto; flex: 1; padding: 0; }
+      .analytics-table { width: 100%; border-collapse: collapse; }
+      .analytics-table th { position: sticky; top: 0; background: var(--input-bg); z-index: 5; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 12px 15px; font-size: 11px; color: var(--text-sub); }
+      .analytics-table td { padding: 10px 15px; border-bottom: 1px solid var(--border); font-size: 13px; }
+      .analytics-table tr:last-child td { border-bottom: none; }
+      .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+      .card { background: var(--card-kpi-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; }
+      .card-val { font-size: 24px; font-weight: 800; margin-top: 5px; color: var(--accent); }
+      .card-lbl { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+      .trend-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-top: 8px; width: fit-content; }
+      .trend-up { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+      .trend-down { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+      .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+      .chart-box { background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); height: 300px; position: relative; }
+      .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 999; display: none; backdrop-filter: blur(4px); flex-direction: column; color: white; font-weight: 600; }
+      .spin { width: 30px; height: 30px; border: 3px solid #fff; border-top-color: var(--accent); border-radius: 50%; animation: r 1s infinite linear; margin-bottom: 10px; }
+      @keyframes r { to { transform: rotate(360deg); } }
+      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+      .modal-box { background: var(--bg-panel); padding: 25px; border-radius: 16px; width: 90%; max-width: 350px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.9); transition: 0.2s; }
+      .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+      .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+      .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; }
+      .btn-confirm-yes { background: var(--danger); color: white; }
+      .btn-confirm-no { background: var(--input-bg); border: 1px solid var(--border) !important; color: var(--text-main); }
+      .qty-wrapper { display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; height: 46px; }
+      .qty-btn { width: 50px; height: 100%; background: transparent; border: none; color: var(--text-main); font-size: 20px; font-weight: 700; cursor: pointer; }
+      .qty-input { width: 80px; text-align: center; border: none; background: transparent; font-weight: 700; font-size: 18px; }
+      .toast { visibility: hidden; min-width: 250px; background-color: var(--text-main); color: var(--bg-app); text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); opacity: 0; transition: 0.3s; }
+      .toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+      .toast.error { background-color: var(--danger); color: white; }
+      .toast.success { background-color: var(--success); color: white; }
       .search-box { position: relative; }
-      .results-list { position: absolute;
-        top: 105%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--bg-panel); border: 2px solid var(--accent); border-radius: 10px; z-index: 100;
-        display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-      .res-item { padding: 12px 15px; cursor: pointer;
-        border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-      .res-item:hover { background: var(--input-bg); color: var(--accent);
-      }
+      .results-list { position: absolute; top: 105%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--bg-panel); border: 2px solid var(--accent); border-radius: 10px; z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+      .res-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+      .res-item:hover { background: var(--input-bg); color: var(--accent); }
 
       @media (max-width: 768px) {
-        body { padding: 10px;
-        height: auto; overflow: auto; }
-        .app-wrapper { height: auto; min-height: 100vh;
-        }
-        .content-area, .tab-page { overflow: visible; height: auto; padding: 15px;
-        }
-        .nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px;
-        }
-        .kpi-row { grid-template-columns: 1fr 1fr;
-        }
-        .charts-grid, .bottom-grid { grid-template-columns: 1fr;
-        }
-        
-        .responsive-table-wrapper table, .responsive-table-wrapper thead, .responsive-table-wrapper tbody, .responsive-table-wrapper th, .responsive-table-wrapper td, .responsive-table-wrapper tr { display: block;
-        }
-        .responsive-table-wrapper thead tr { display: none;
-        }
-        .responsive-table-wrapper tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px;
-        background: var(--input-bg); padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .responsive-table-wrapper td { border: none;
-        padding: 8px 0; position: relative; display: flex; align-items: center; justify-content: space-between;
-        }
-        .responsive-table-wrapper td::before { content: attr(data-label); font-weight: 700; font-size: 11px; color: var(--text-sub);
-        text-transform: uppercase; margin-right: 15px; min-width: 80px; }
-        .tbl-input { text-align: right;
-        border: 1px solid var(--border); padding: 8px; }
-        .responsive-table-wrapper td.actions-cell { justify-content: flex-end;
-        border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 5px; gap: 10px;
-        }
-        .responsive-table-wrapper td.actions-cell::before { display: none;
-        }
-        .w-check { width: 100%; text-align: left;
-        }
+        body { padding: 10px; height: auto; overflow: auto; }
+        .app-wrapper { height: auto; min-height: 100vh; }
+        .content-area, .tab-page { overflow: visible; height: auto; padding: 15px; }
+        .nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+        .kpi-row { grid-template-columns: 1fr 1fr; }
+        .charts-grid, .bottom-grid { grid-template-columns: 1fr; }
+        .responsive-table-wrapper table, .responsive-table-wrapper thead, .responsive-table-wrapper tbody, .responsive-table-wrapper th, .responsive-table-wrapper td, .responsive-table-wrapper tr { display: block; }
+        .responsive-table-wrapper thead tr { display: none; }
+        .responsive-table-wrapper tr { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .responsive-table-wrapper td { border: none; padding: 8px 0; position: relative; display: flex; align-items: center; justify-content: space-between; }
+        .responsive-table-wrapper td::before { content: attr(data-label); font-weight: 700; font-size: 11px; color: var(--text-sub); text-transform: uppercase; margin-right: 15px; min-width: 80px; }
+        .tbl-input { text-align: right; border: 1px solid var(--border); padding: 8px; }
+        .responsive-table-wrapper td.actions-cell { justify-content: flex-end; border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 5px; gap: 10px; }
+        .responsive-table-wrapper td.actions-cell::before { display: none; }
+        .w-check { width: 100%; text-align: left; }
       }
-      @media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr;
-      } }
+      @media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
@@ -232,9 +113,8 @@
           <div class="modal-title">Удалить эту запись?</div>
           <div style="font-size: 13px; color: var(--text-sub);">Это действие нельзя отменить.</div>
           <div class="modal-actions">
-    
-          <button class="btn-confirm-no" onclick="closeConfirm()">Нет, отмена</button>
-             <button class="btn-confirm-yes" id="btnConfirmYes">Да, удалить</button>
+            <button class="btn-confirm-no" onclick="closeConfirm()">Нет, отмена</button>
+            <button class="btn-confirm-yes" id="btnConfirmYes">Да, удалить</button>
           </div>
        </div>
     </div>
@@ -246,10 +126,9 @@
         <div id="robotContainer" onclick="toggleTheme()" style="width: 50px; height: 50px; background: #050505; border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-shrink: 0; border: 1px solid var(--border);">
              <canvas id="robotCanvas" width="300" height="300" style="width: 100%; height: 100%; display: block;"></canvas>
         </div>
-
       </div>
+
       <div class="nav">
-    
         <button class="nav-btn active" onclick="tab('Entry')">➕ Ввод</button>
         <button class="nav-btn" onclick="tab('Unshipped')">📦 Отгрузка</button>
         <button class="nav-btn" onclick="tab('Ref')">📚 Справочник</button>
@@ -257,24 +136,21 @@
       </div>
       
       <div class="content-area">
+        
         <div id="Entry" class="tab-page active">
-           <div style="max-width: 500px;
-        margin: 0 auto;">
+           <div style="max-width: 500px; margin: 0 auto;">
              <h3>Новая запись</h3>
              <form id="formEntry">
                <div style="margin-bottom: 15px;"><label>Город (Магазин)</label><select id="entryCity" required></select></div>
                <div class="search-box" style="margin-bottom: 15px;">
                  <label>Поиск товара</label>
-              
-               <input type="text" id="searchInp" placeholder="Начните вводить..." autocomplete="off" required>
+                 <input type="text" id="searchInp" placeholder="Начните вводить..." autocomplete="off" required>
                  <div class="results-list" id="resList"></div>
                  <input type="hidden" id="prodName">
                </div>
-               <div style="display:grid;
-        grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+               <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                  <div><label>Количество</label><div class="qty-wrapper"><button type="button" class="qty-btn" onclick="changeQty(-1)">−</button><input type="number" id="qty" value="1" min="1" class="qty-input" required><button type="button" class="qty-btn" onclick="changeQty(1)">+</button></div></div>
-                 <div><label>Итого</label><div id="totalPreview" style="padding: 12px;
-        font-weight: 700; color: var(--accent); font-size:18px;">0 ₽</div></div>
+                 <div><label>Итого</label><div id="totalPreview" style="padding: 12px; font-weight: 700; color: var(--accent); font-size:18px;">0 ₽</div></div>
                </div>
                <button type="submit" class="btn" id="saveBtn">Сохранить</button>
              </form>
@@ -282,54 +158,40 @@
         </div>
 
         <div id="Unshipped" class="tab-page">
-           <div style="background: var(--input-bg);
-        padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
-             <label style="font-size:13px;
-        margin-bottom:10px;">ВЫБЕРИТЕ ГОРОД ДЛЯ ОТГРУЗКИ:</label>
-             <div style="display:flex; gap: 15px;
-        align-items: center; width: 100%; flex-wrap: wrap;">
-               <div style="flex:1;
-        width:100%"><select id="shipCity" onchange="loadUnshippedTable()"></select></div>
-               <button class="btn btn-sm" style="width: auto;
-        white-space: nowrap; flex-grow: 1;" onclick="loadUnshippedTable()">Обновить</button>
+           <div style="background: var(--input-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border);">
+             <label style="font-size:13px; margin-bottom:10px;">ВЫБЕРИТЕ ГОРОД ДЛЯ ОТГРУЗКИ:</label>
+             <div style="display:flex; gap: 15px; align-items: center; width: 100%; flex-wrap: wrap;">
+               <div style="flex:1; width:100%"><select id="shipCity" onchange="loadUnshippedTable()"></select></div>
+               <button class="btn btn-sm" style="width: auto; white-space: nowrap; flex-grow: 1;" onclick="loadUnshippedTable()">Обновить</button>
              </div>
            </div>
-           <div id="unshippedContent"><div style="text-align:center;
-        color:var(--text-sub); margin-top: 50px;"><div style="font-size: 40px; margin-bottom:10px;">🏪</div>Выберите город выше</div></div>
+           <div id="unshippedContent"><div style="text-align:center; color:var(--text-sub); margin-top: 50px;"><div style="font-size: 40px; margin-bottom:10px;">🏪</div>Выберите город выше</div></div>
         </div>
 
         <div id="Ref" class="tab-page">
-           <div style="display:flex;
-        flex-direction:column; gap:25px;">
-             <div style="background: var(--bg-panel); padding: 20px;
-        border-radius: 12px; border: 1px solid var(--border);">
+           <div style="display:flex; flex-direction:column; gap:25px;">
+             <div style="background: var(--bg-panel); padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
                <h4 style="margin-top:0">Добавить новый товар</h4>
-               <form id="formRef" style="display:grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; align-items:end;">
+               <form id="formRef" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; align-items:end;">
                  <div><label>Название</label><input id="newPName" required></div>
                  <div><label>Цена</label><input type="number" id="newPPrice" required></div>
                  <div><label>Категория</label><input list="catList" id="newPCat" placeholder="Выберите..." required><datalist id="catList"></datalist></div>
                  <button type="submit" class="btn" id="productSubmitBtn">Добавить</button>
-              
                </form>
              </div>
              <div>
                 <input type="text" id="filterRef" placeholder="🔍 Быстрый поиск..." onkeyup="filterRef()" style="margin-bottom: 15px;">
-                <div class="responsive-table-wrapper" style="max-height: 600px;
-        overflow-y: auto;">
+                <div class="responsive-table-wrapper" style="max-height: 600px; overflow-y: auto;">
                     <table id="refTable">
                         <thead>
                             <tr>
-                          
-                        <th style="width:40%">Товар</th>
+                                <th style="width:40%">Товар</th>
                                 <th style="width:25%">Категория</th>
                                 <th style="width:15%">Цена</th>
-                           
-                        <th style="text-align:right">Действия</th>
+                                <th style="text-align:right">Действия</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
-                  
                   </table>
                 </div>
              </div>
@@ -337,75 +199,63 @@
         </div>
 
         <div id="Analytics" class="tab-page">
-           <div style="display:flex;
-        gap:10px; margin-bottom: 20px; flex-wrap: wrap;">
+           <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap: wrap;">
              <select id="anYear" style="width:120px" onchange="loadAnalytics()"></select>
              <select id="anMonth" style="width:140px" onchange="loadAnalytics()"></select>
-             <select id="anCity" style="flex: 1;
-        min-width: 200px;" onchange="loadAnalytics()"><option value="All">Все города</option></select>
+             <select id="anCity" style="flex: 1; min-width: 200px;" onchange="loadAnalytics()"><option value="All">Все города</option></select>
              <button class="btn btn-sm" onclick="loadAnalytics()">Обновить</button>
            </div>
            <div class="kpi-row" id="kpi"></div>
            <div class="charts-grid">
              <div class="chart-box">
-                <div style="padding: 15px 15px 5px 15px;">
-         
-                    <div class="chart-title" style="margin:0">Динамика Выручки</div>
-                </div>
-                <div style="height:240px;
-        padding: 0 10px 10px 10px;"><canvas id="chartTrend"></canvas></div>
+                <div style="padding: 15px 15px 5px 15px;"><div class="chart-title" style="margin:0">Динамика Выручки</div></div>
+                <div style="height:240px; padding: 0 10px 10px 10px;"><canvas id="chartTrend"></canvas></div>
              </div>
              <div class="chart-box">
-                <div style="padding: 15px 15px 5px 15px;">
-                    <div class="chart-title" style="margin:0">Доля Городов</div>
-                </div>
-        
-                <div style="height:240px; display:flex; justify-content:center;
-        padding: 0 10px 10px 10px;"><canvas id="chartCity"></canvas></div>
+                <div style="padding: 15px 15px 5px 15px;"><div class="chart-title" style="margin:0">Доля Городов</div></div>
+                <div style="height:240px; display:flex; justify-content:center; padding: 0 10px 10px 10px;"><canvas id="chartCity"></canvas></div>
              </div>
            </div>
            <div class="bottom-grid">
              <div class="chart-box">
-                <div style="padding: 15px 15px 5px 15px;">
-                    <div class="chart-title" style="margin:0">Продажи по 
-        Категориям</div>
-                </div>
-                <div style="height:240px;
-        padding: 0 10px 10px 10px;"><canvas id="chartCat"></canvas></div>
+                <div style="padding: 15px 15px 5px 15px;"><div class="chart-title" style="margin:0">Продажи по Категориям</div></div>
+                <div style="height:240px; padding: 0 10px 10px 10px;"><canvas id="chartCat"></canvas></div>
              </div>
              <div class="table-box">
                 <div class="table-box-header">🏆 Топ-20 Товаров</div>
                 <div class="table-box-scroll">
                     <table id="topTable" class="analytics-table">
-          
-                        <thead>
-                            <tr>
-                                <th>Товар</th>
-                          
-                        <th style="text-align:right">Сумма</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Товар</th><th style="text-align:right">Сумма</th></tr></thead>
                         <tbody></tbody>
-                 
                    </table>
                 </div>
              </div>
            </div>
         </div>
-      </div>
+
+     </div>
     </div>
 
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbxMDJUskQU9M9HeaFQrTvNliMUCDGe6IHhovOkKx1qZ9L2iJza2KSLsVLQK0k0hib__/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbxz-zO6lDHxwHjwF7euL4bsOWfXTUcwbfzY2V0yOATJxWGyLKdxJhP9QEeku3jWgDwr/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
       let CONFIG = {}, PRODUCTS = [], CHARTS = {}, LAST_DATA = null;
       let deleteCallback = null;
+      let TG_USER_ID = null;
+
       window.onload = () => { 
-        if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.expand();
+        // Логика получения ID из Telegram
+        if(window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.expand();
+            if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                TG_USER_ID = window.Telegram.WebApp.initDataUnsafe.user.id;
+            }
+        }
+
         document.getElementById('loader').style.display='flex'; 
         
         loadConfig(); 
@@ -416,16 +266,13 @@
         document.getElementById('qty').oninput=calcTotal; 
         if(localStorage.getItem('crm_theme')==='dark') {
             document.body.setAttribute('data-theme','dark');
-            // Кнопка темы теперь робот
         }
       };
 
-      // --- УНИВЕРСАЛЬНЫЙ МОСТ ---
       async function runBackend(action, payload = {}) {
          if (IS_GOOGLE) {
              return new Promise((resolve, reject) => {
-                 if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig();
-     
+                 if(action === 'getInitialConfig') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getInitialConfig(payload.telegramId); // Передаем ID
                  else if(action === 'saveNewEntry') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveNewEntry(payload);
                  else if(action === 'getUnshippedForCity') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getUnshippedForCity(payload.city);
                  else if(action === 'shipAndGeneratePdf') google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).shipAndGeneratePdf(payload.city, payload.items);
@@ -443,6 +290,9 @@
                 throw new Error("No URL");
              }
              payload.action = action;
+             // Если это конфиг, добавляем telegramId в payload (для Web-версии)
+             if (action === 'getInitialConfig') payload.telegramId = TG_USER_ID;
+
              try {
                  const res = await fetch(GAS_URL, {
                      method: "POST",
@@ -464,9 +314,12 @@
       }
 
       function loadConfig(){
-        runBackend('getInitialConfig')
+        runBackend('getInitialConfig', { telegramId: TG_USER_ID })
         .then(c => {
-          CONFIG=c; PRODUCTS=c.products; 
+          CONFIG=c; PRODUCTS=c.products;
+          
+          if(c.user) showToast(`👋 Привет, ${c.user}!`, false); // Приветствие
+
           fillSel('entryCity',c.cities); 
           const s=document.getElementById('shipCity');s.innerHTML='';s.add(new Option('Выберите город...',''));c.cities.forEach(x=>s.add(new Option(x,x))); 
           fillSel('anCity',c.cities); 
@@ -478,8 +331,7 @@
           
           let prodList = document.getElementById('dlProducts');
           if(!prodList) { prodList = document.createElement('datalist'); prodList.id = 'dlProducts'; document.body.appendChild(prodList); }
-          prodList.innerHTML = ''; c.products.forEach(p => { const op = document.createElement('option'); op.value = p.name; prodList.appendChild(op);
-});
+          prodList.innerHTML = ''; c.products.forEach(p => { const op = document.createElement('option'); op.value = p.name; prodList.appendChild(op); });
 
           const m=document.getElementById('anMonth'); m.innerHTML = ''; m.add(new Option('Весь год', 'all')); 
           c.months.forEach((x,i)=>m.add(new Option(x,i))); m.value = new Date().getMonth(); 
@@ -490,7 +342,18 @@
           document.getElementById('loader').style.display='none'; 
           loadAnalytics();
         })
-        .catch(err => { showToast("Ошибка Config: " + err, true); document.getElementById('loader').style.display='none'; });
+        .catch(err => { 
+            // КРАСНЫЙ ЭКРАН СМЕРТИ, ЕСЛИ ДОСТУП ЗАПРЕЩЕН
+            document.getElementById('loader').style.display='none'; 
+            document.body.innerHTML = `
+                <div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:var(--bg-app); color:var(--text-main);">
+                    <div style="font-size:60px; margin-bottom:20px;">⛔</div>
+                    <h2 style="color:var(--danger)">Ошибка доступа</h2>
+                    <p style="color:var(--text-sub); margin-bottom:20px; white-space: pre-wrap;">${err.message || err}</p>
+                    <p style="font-size:12px; color:#999;">Если это ошибка, сделайте скриншот и отправьте администратору.</p>
+                </div>
+            `;
+        });
       }
 
       function loadUnshippedTable(){
@@ -504,38 +367,32 @@
             d.dataset.items = JSON.stringify(i);
             
             let h=`<div style="background:var(--input-bg); padding:15px; border-radius:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                  
                      <span>Всего поз.: <b>${i.length}</b></span>
                      <button class="btn btn-sm" style="background:var(--success)" onclick="doShip('${c}')">📄 Накладная (PDF)</button>
                    </div>
             <div class="responsive-table-wrapper">
             <table>
               <thead>
-          
                 <tr>
                   <th class="w-check"><input type="checkbox" onchange="toggleAll(this)" checked></th>
                   <th style="width:80px">Дата</th>
                   <th>Товар</th>
                   <th style="width:70px">Кол-во</th>
-                
                   <th style="width:220px; text-align:right">Действия</th>
                 </tr>
               </thead>
               <tbody>`;
             i.forEach((x, index)=>{ 
               h+=`<tr id="row-${index}">
-                    <td class="w-check" data-label=""><input 
- type="checkbox" class="ship-chk" data-idx="${index}" checked></td>
+                    <td class="w-check" data-label=""><input type="checkbox" class="ship-chk" data-idx="${index}" checked></td>
                     <td data-label="Дата" style="font-size:11px; color:var(--text-sub)">${x.date}</td>
                     <td data-label="Товар"><input type="text" list="dlProducts" class="tbl-input" id="name-${index}" value="${x.name}" onchange="showSaveBtn(${index})"></td>
                     <td data-label="Кол-во"><input type="number" class="tbl-input" id="qty-${index}" value="${x.qty}" min="1" style="width:80px" onchange="showSaveBtn(${index})"></td>
-                   
-                 <td data-label="Действия" class="actions-cell">
+                    <td data-label="Действия" class="actions-cell">
                        <button id="btn-save-${index}" class="btn-action btn-save" onclick="saveRow('${c}', ${x.rowIndex}, ${index})" style="display:none;">Сохранить</button>
                        <button class="btn-action btn-danger" onclick="confirmDeleteRow('${c}', ${x.rowIndex})">Удалить</button>
                     </td>
                   </tr>` 
- 
             });
             h+='</tbody></table></div>';
             d.innerHTML=h;
@@ -552,8 +409,7 @@
            r.innerHTML = `
              <td data-label="Товар"><input type="text" class="tbl-input" id="p-name-${idx}" value="${x.name}" onchange="showProdSave(${idx})"></td>
              <td data-label="Категория"><input type="text" list="catList" class="tbl-input" id="p-cat-${idx}" value="${x.category}" onchange="showProdSave(${idx})"></td>
-             <td data-label="Цена"><input type="number" class="tbl-input" 
-                id="p-price-${idx}" value="${x.price}" onchange="showProdSave(${idx})"></td>
+             <td data-label="Цена"><input type="number" class="tbl-input" id="p-price-${idx}" value="${x.price}" onchange="showProdSave(${idx})"></td>
              <td data-label="Действия" class="actions-cell">
                 <button id="btn-prod-save-${idx}" class="btn-action btn-save" onclick="saveProdRow(${x.rowIndex}, ${idx})" style="display:none;">Сохранить</button>
                 <button class="btn-action btn-danger" onclick="confirmDeleteProdRow(${x.rowIndex})">Удалить</button>
@@ -576,8 +432,7 @@
           deleteCallback = null;
       }
 
-      function showSaveBtn(idx) { document.getElementById(`btn-save-${idx}`).style.display = 'inline-flex';
-      }
+      function showSaveBtn(idx) { document.getElementById(`btn-save-${idx}`).style.display = 'inline-flex'; }
       function saveRow(city, rowIndex, localIdx) {
          const btn = document.getElementById(`btn-save-${localIdx}`);
          btn.innerText = '⏳'; 
@@ -594,8 +449,7 @@
          });
       }
 
-      function showProdSave(idx) { document.getElementById(`btn-prod-save-${idx}`).style.display = 'inline-flex';
-      }
+      function showProdSave(idx) { document.getElementById(`btn-prod-save-${idx}`).style.display = 'inline-flex'; }
       function saveProdRow(rowIndex, idx) {
          const btn = document.getElementById(`btn-prod-save-${idx}`);
          btn.innerText = '⏳';
@@ -620,8 +474,7 @@
       function doShip(c){
         const d=document.getElementById('unshippedContent'); if(!d.dataset.items) return;
         const checkboxes = document.querySelectorAll('.ship-chk:checked');
-        if (checkboxes.length === 0) { showToast("Выберите позиции!", true); return;
-        }
+        if (checkboxes.length === 0) { showToast("Выберите позиции!", true); return; }
         const allItems=JSON.parse(d.dataset.items); const selectedItems = [];
         checkboxes.forEach(cb => selectedItems.push(allItems[parseInt(cb.getAttribute('data-idx'))]));
         const loader = document.getElementById('loader'), loaderTxt = document.getElementById('loaderTxt');
@@ -638,8 +491,7 @@
       }
       function loadAnalytics(){ document.getElementById('loader').style.display = 'flex';
         let p = 'month', m = document.getElementById('anMonth').value;
-        if(m === 'all') { p = 'year'; m = 0;
-        }
+        if(m === 'all') { p = 'year'; m = 0; }
         runBackend('getAnalyticsData', { period: p, mIdx: m, yr: document.getElementById('anYear').value, city: document.getElementById('anCity').value })
         .then(d => { drawAnalytics(d); document.getElementById('loader').style.display = 'none'; }).catch(e => { document.getElementById('loader').style.display = 'none'; showToast("Ошибка аналитики: " + e, true); });
       }
@@ -651,8 +503,7 @@
       function fillSel(id,a,p){const e=document.getElementById(id),s=e.value;e.innerHTML='';if(id==='anCity')e.add(new Option('Все города','All'));if(p)e.add(new Option(p,''));a.forEach(x=>e.add(new Option(x,x)));if(s&&Array.from(e.options).some(o=>o.value===s))e.value=s;}
       function smartSearch(e){const v=e.target.value.toLowerCase(),l=document.getElementById('resList');l.innerHTML='';if(!v){l.style.display='none';return;}const m=PRODUCTS.filter(p=>p.name.toLowerCase().includes(v)).slice(0,10);if(m.length){l.style.display='block';m.forEach(p=>{const d=document.createElement('div');d.className='res-item';d.innerHTML=`<span><b>${p.name}</b> <small>(${p.category})</small></span><span>${p.price} ₽</span>`;d.onclick=()=>{document.getElementById('searchInp').value=p.name;document.getElementById('prodName').value=p.name;l.style.display='none';calcTotal()};l.appendChild(d)})}else{l.style.display='none'}}
       function calcTotal(){const n=document.getElementById('searchInp').value,q=document.getElementById('qty').value,p=PRODUCTS.find(x=>x.name.toLowerCase()===n.toLowerCase()),pr=p?p.price:0;document.getElementById('totalPreview').innerText=(pr*q)+" ₽"}
-      function toggleAll(source) { document.querySelectorAll('.ship-chk').forEach(cb => cb.checked = source.checked);
-      }
+      function toggleAll(source) { document.querySelectorAll('.ship-chk').forEach(cb => cb.checked = source.checked); }
       function filterRef(){const v=document.getElementById('filterRef').value.toLowerCase();document.querySelectorAll('#refTable tbody tr').forEach(r=>{ 
          const txt = r.querySelector('input[id^="p-name"]').value + " " + r.querySelector('input[id^="p-cat"]').value;
          r.style.display = txt.toLowerCase().includes(v) ? '' : 'none';
@@ -661,14 +512,12 @@
       function drawAnalytics(d) { 
         LAST_DATA = d;
         const g = d.prevRev > 0 ? ((d.totalRev - d.prevRev)/d.prevRev)*100 : 0;
-        document.getElementById('kpi').innerHTML=`<div class="card"><div class="card-lbl">Выручка</div><div class="card-val" style="color:var(--accent)">${d.totalRev.toLocaleString()} ₽</div><div class="trend-badge ${g>=0?'trend-up':'trend-down'}">${g>=0?'↑':'↓'} ${Math.abs(g).toFixed(1)}%</div><div class="sub-text">Прошлый: ${d.prevRev.toLocaleString()} ₽</div></div><div class="card"><div class="card-lbl">В ожидании</div><div class="card-val" style="color:#f59e0b">${d.pend.toLocaleString()} ₽</div><div class="sub-text">Это <b>${(d.totalRev+d.pend)>0?((d.pend/(d.totalRev+d.pend))*100).toFixed(1):0}%</b> от всего объема</div></div><div class="card"><div class="card-lbl">Заказы</div><div class="card-val">${d.count}</div><div class="sub-text">Успешных сделок</div></div><div class="card"><div class="card-lbl">Ср.
-        Чек</div><div class="card-val" style="color:var(--success)">${d.avg.toLocaleString()} ₽</div></div>`; 
+        document.getElementById('kpi').innerHTML=`<div class="card"><div class="card-lbl">Выручка</div><div class="card-val" style="color:var(--accent)">${d.totalRev.toLocaleString()} ₽</div><div class="trend-badge ${g>=0?'trend-up':'trend-down'}">${g>=0?'↑':'↓'} ${Math.abs(g).toFixed(1)}%</div><div class="sub-text">Прошлый: ${d.prevRev.toLocaleString()} ₽</div></div><div class="card"><div class="card-lbl">В ожидании</div><div class="card-val" style="color:#f59e0b">${d.pend.toLocaleString()} ₽</div><div class="sub-text">Это <b>${(d.totalRev+d.pend)>0?((d.pend/(d.totalRev+d.pend))*100).toFixed(1):0}%</b> от всего объема</div></div><div class="card"><div class="card-lbl">Заказы</div><div class="card-val">${d.count}</div><div class="sub-text">Успешных сделок</div></div><div class="card"><div class="card-lbl">Ср. Чек</div><div class="card-val" style="color:var(--success)">${d.avg.toLocaleString()} ₽</div></div>`; 
         
         const th=document.body.getAttribute('data-theme'), c=th==='dark'?'#cbd5e1':'#64748b', gridColor=th==='dark'?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)';
-        renderChart('chartTrend', 'bar', {labels:d.trendL, datasets:[{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]}, {scales:{x:{grid:{display:false},ticks:{color:c}},y:{grid:{color:gridColor},ticks:{color:c}}}}); 
+        renderChart('chartTrend', 'bar', {labels:d.trendL, datasets:[{label:'Выручка', data:d.trendD, backgroundColor:'#3b82f6', borderRadius:4}]}, {scales:{x:{grid:{display:false},ticks:{color:c}},y:{grid:{color:gridColor},ticks:{color:c}}}});
         renderChart('chartCity', 'doughnut', {labels:d.cityStats?Object.keys(d.cityStats):[], datasets:[{data:d.cityStats?Object.values(d.cityStats):[], backgroundColor:['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6'], borderWidth:0}]}, {plugins:{legend:{position:'right',labels:{color:c,font:{size:11},boxWidth:12}}}});
-        renderChart('chartCat', 'bar', {labels:Object.keys(d.catStats), datasets:[{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]}, {indexAxis:'y', scales:{x:{grid:{color:gridColor},ticks:{color:c}},y:{grid:{display:false},ticks:{color:c}}}}); 
-        
+        renderChart('chartCat', 'bar', {labels:Object.keys(d.catStats), datasets:[{label:'Продажи', data:Object.values(d.catStats), backgroundColor:'#8b5cf6', borderRadius:4}]}, {indexAxis:'y', scales:{x:{grid:{color:gridColor},ticks:{color:c}},y:{grid:{display:false},ticks:{color:c}}}});
         const tb = document.querySelector('#topTable tbody'); tb.innerHTML = '';
         if (d.top) d.top.forEach(x => { 
            const tr=document.createElement('tr'); 
@@ -682,171 +531,84 @@
       function tab(i){document.querySelectorAll('.tab-page').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));document.getElementById(i).classList.add('active');event.target.classList.add('active');if(i==='Unshipped')loadUnshippedTable()}
       
       function toggleTheme(){ 
-        const b=document.body,d=b.getAttribute('data-theme')==='dark'; 
+        const b=document.body,d=b.getAttribute('data-theme')==='dark';
         b.setAttribute('data-theme',d?'light':'dark'); 
         localStorage.setItem('crm_theme',d?'light':'dark');
         if(LAST_DATA) { drawAnalytics(LAST_DATA); } else { loadAnalytics(); } 
       }
 
       // ==========================================
-      // 🤖 РОБОТ: НОВАЯ ЛОГИКА (HOVER = ЗЛОСТЬ, BUTTON = WINK)
+      // 🤖 РОБОТ
       // ==========================================
       (function initRobot() {
           const canvas = document.getElementById('robotCanvas');
           if (!canvas) return;
           const ctx = canvas.getContext('2d');
-
-          // Внутреннее разрешение для четкости
           let width = 300, height = 300; 
           let centerX = width / 2, centerY = height / 2;
-
-          // Состояние
           const mouse = { x: 0, y: 0 };
           const currentLook = { x: 0, y: 0 };
           const targetLook = { x: 0, y: 0 };
-          
-          let isIdle = false;
-          let isAngry = false;
-          let isBlinking = false;
-          let isWinking = false; // Новое состояние: Подмигивание
-          let idleTimer = null;
-          
-          // Отдельное отслеживание высоты для правого глаза (для wink)
+          let isIdle = false, isAngry = false, isBlinking = false, isWinking = false, idleTimer = null;
           let currentRightHeight = 120;
-
-          const eyeState = {
-              width: 90, height: 120,
-              rTopLeft: 20, rTopRight: 20, rBotRight: 20, rBotLeft: 20,
-              r: 0, g: 210, b: 255,
-              rotation: 0
-          };
-
-          // --- Управление ---
+          const eyeState = { width: 90, height: 120, rTopLeft: 20, rTopRight: 20, rBotRight: 20, rBotLeft: 20, r: 0, g: 210, b: 255, rotation: 0 };
           function resetIdleTimer() {
               if (isAngry) return;
               isIdle = false;
               clearTimeout(idleTimer);
               idleTimer = setTimeout(() => { isIdle = true; triggerRandomLook(); }, 2500);
           }
-
           document.addEventListener('mousemove', e => {
-              const winCX = window.innerWidth / 2;
-              const winCY = window.innerHeight / 2;
+              const winCX = window.innerWidth / 2, winCY = window.innerHeight / 2;
               mouse.x = (e.clientX - winCX) / (winCX * 0.8);
               mouse.y = (e.clientY - winCY) / (winCY * 0.8);
               mouse.x = Math.max(-1.5, Math.min(1.5, mouse.x));
               mouse.y = Math.max(-1.5, Math.min(1.5, mouse.y));
-
-              if (!isAngry) {
-                  targetLook.x = mouse.x;
-                  targetLook.y = mouse.y;
-              }
+              if (!isAngry) { targetLook.x = mouse.x; targetLook.y = mouse.y; }
               resetIdleTimer();
           });
-
           const robotContainer = document.getElementById('robotContainer');
-          
-          // ЛОГИКА 1: Злость при наведении (Hover)
           robotContainer.addEventListener('mouseenter', () => { isAngry = true; targetLook.x = 0; targetLook.y = 0; });
           robotContainer.addEventListener('mouseleave', () => { isAngry = false; resetIdleTimer(); });
-          
-          // Мобильный touch (аналог hover)
           robotContainer.addEventListener('touchstart', (e) => { isAngry = true; targetLook.x = 0; targetLook.y = 0; }, {passive: true});
           robotContainer.addEventListener('touchend', () => { isAngry = false; resetIdleTimer(); });
-
-          // ЛОГИКА 2: Подмигивание при нажатии на ЛЮБУЮ кнопку
-          // Используем делегирование событий
           document.addEventListener('click', (e) => {
-             // Проверяем, был ли клик по кнопке (или внутри кнопки)
-             if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.classList.contains('nav-btn')) {
-                 triggerWink();
-             }
+             if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.classList.contains('nav-btn')) { triggerWink(); }
           });
-
-          function triggerWink() {
-             if (isWinking || isBlinking) return;
-             isWinking = true;
-             // Быстрое подмигивание (300мс)
-             setTimeout(() => { isWinking = false; }, 300);
-          }
-
+          function triggerWink() { if (isWinking || isBlinking) return; isWinking = true; setTimeout(() => { isWinking = false; }, 300); }
           function triggerRandomLook() {
               if (!isIdle || isAngry) return;
               targetLook.x = (Math.random() - 0.5) * 1.5;
               targetLook.y = (Math.random() - 0.5) * 1.0;
               setTimeout(triggerRandomLook, Math.random() * 2000 + 2000);
           }
-
           function triggerBlink() {
-              // Моргаем только если не злимся и не подмигиваем сейчас
-              if (!document.hidden && !isBlinking && !isWinking && !isAngry) {
-                  isBlinking = true;
-                  setTimeout(() => { isBlinking = false; }, 150);
-              }
+              if (!document.hidden && !isBlinking && !isWinking && !isAngry) { isBlinking = true; setTimeout(() => { isBlinking = false; }, 150); }
               setTimeout(triggerBlink, Math.random() * 4000 + 2000);
           }
           setTimeout(triggerBlink, 2000);
-
-          // --- Рисование ---
           function lerp(start, end, factor) { return start + (end - start) * factor; }
-
           function drawEye(ctx, x, y, w, h, state, isLeft) {
-              ctx.save();
-              ctx.translate(x, y);
-              const dir = isLeft ? -1 : 1;
-              ctx.rotate(state.rotation * dir);
-              ctx.beginPath();
-              const hw = w / 2, hh = h / 2;
-              const safeH = Math.max(h, 0), maxR = safeH / 2;
-              // Радиусы
+              ctx.save(); ctx.translate(x, y); const dir = isLeft ? -1 : 1; ctx.rotate(state.rotation * dir); ctx.beginPath();
+              const hw = w / 2, hh = h / 2, safeH = Math.max(h, 0), maxR = safeH / 2;
               const rTL = Math.min(state.rTopLeft, maxR), rTR = Math.min(state.rTopRight, maxR), rBR = Math.min(state.rBotRight, maxR), rBL = Math.min(state.rBotLeft, maxR);
-
-              ctx.moveTo(-hw + rTL, -hh);
-              ctx.lineTo(hw - rTR, -hh);
-              ctx.quadraticCurveTo(hw, -hh, hw, -hh + rTR);
-              ctx.lineTo(hw, hh - rBR);
-              ctx.quadraticCurveTo(hw, hh, hw - rBR, hh);
-              ctx.lineTo(-hw + rBL, hh);
-              ctx.quadraticCurveTo(-hw, hh, -hw, hh - rBL);
-              ctx.lineTo(-hw, -hh + rTL);
-              ctx.quadraticCurveTo(-hw, -hh, -hw + rTL, -hh);
-              ctx.closePath();
-
+              ctx.moveTo(-hw + rTL, -hh); ctx.lineTo(hw - rTR, -hh); ctx.quadraticCurveTo(hw, -hh, hw, -hh + rTR); ctx.lineTo(hw, hh - rBR);
+              ctx.quadraticCurveTo(hw, hh, hw - rBR, hh); ctx.lineTo(-hw + rBL, hh); ctx.quadraticCurveTo(-hw, hh, -hw, hh - rBL); ctx.lineTo(-hw, -hh + rTL);
+              ctx.quadraticCurveTo(-hw, -hh, -hw + rTL, -hh); ctx.closePath();
               ctx.fillStyle = `rgb(${state.r}, ${state.g}, ${state.b})`;
-              // Свечение меньше, если моргаем/подмигиваем
-              const isClosed = (h < 10);
-              ctx.shadowBlur = isClosed ? 40 : 25; 
-              ctx.shadowColor = `rgba(${state.r}, ${state.g}, ${state.b}, ${isClosed ? 0.9 : 0.6})`;
-              ctx.fill();
-              ctx.restore();
+              const isClosed = (h < 10); ctx.shadowBlur = isClosed ? 40 : 25; ctx.shadowColor = `rgba(${state.r}, ${state.g}, ${state.b}, ${isClosed ? 0.9 : 0.6})`;
+              ctx.fill(); ctx.restore();
           }
-
           function animate() {
               ctx.clearRect(0, 0, width, height);
-              
-              // 1. Базовое Целевое состояние
               let targetState = {};
-              if (isAngry) {
-                  targetState = { width: 95, height: 90, rTopLeft: 5, rTopRight: 40, rBotRight: 40, rBotLeft: 5, r: 255, g: 0, b: 50, rotation: 15 * (Math.PI / 180) };
-              } else if (isIdle) {
-                  targetState = { width: 90, height: 120, rTopLeft: 20, rTopRight: 20, rBotRight: 20, rBotLeft: 20, r: 0, g: 210, b: 255, rotation: 0 };
-              } else {
-                  targetState = { width: 95, height: 85, rTopLeft: 45, rTopRight: 45, rBotRight: 25, rBotLeft: 25, r: 0, g: 255, b: 170, rotation: 0 };
-              }
-
-              // 2. Обычное Моргание (оба глаза)
-              if (isBlinking) {
-                  targetState.height = 4; targetState.width = 95; targetState.r = 255; targetState.g = 255; targetState.b = 255; targetState.rotation = 0;
-              }
-
-              // 3. Интерполяция ОБЩИХ параметров (цвет, ширина, левый глаз)
-              let speed = 0.1;
-              if (isBlinking) speed = 0.35;
-              else if (eyeState.height < 20) speed = 0.25;
-
+              if (isAngry) { targetState = { width: 95, height: 90, rTopLeft: 5, rTopRight: 40, rBotRight: 40, rBotLeft: 5, r: 255, g: 0, b: 50, rotation: 15 * (Math.PI / 180) }; }
+              else if (isIdle) { targetState = { width: 90, height: 120, rTopLeft: 20, rTopRight: 20, rBotRight: 20, rBotLeft: 20, r: 0, g: 210, b: 255, rotation: 0 }; }
+              else { targetState = { width: 95, height: 85, rTopLeft: 45, rTopRight: 45, rBotRight: 25, rBotLeft: 25, r: 0, g: 255, b: 170, rotation: 0 }; }
+              if (isBlinking) { targetState.height = 4; targetState.width = 95; targetState.r = 255; targetState.g = 255; targetState.b = 255; targetState.rotation = 0; }
+              let speed = 0.1; if (isBlinking) speed = 0.35; else if (eyeState.height < 20) speed = 0.25;
               eyeState.width = lerp(eyeState.width, targetState.width, speed);
-              eyeState.height = lerp(eyeState.height, targetState.height, speed); // Высота левого глаза
-              
+              eyeState.height = lerp(eyeState.height, targetState.height, speed);
               eyeState.rotation = lerp(eyeState.rotation, targetState.rotation, speed);
               eyeState.rTopLeft = lerp(eyeState.rTopLeft, targetState.rTopLeft, speed);
               eyeState.rTopRight = lerp(eyeState.rTopRight, targetState.rTopRight, speed);
@@ -855,35 +617,17 @@
               eyeState.r = lerp(eyeState.r, targetState.r, speed);
               eyeState.g = lerp(eyeState.g, targetState.g, speed);
               eyeState.b = lerp(eyeState.b, targetState.b, speed);
-
-              // 4. Логика ПРАВОГО ГЛАЗА (Wink)
-              // Если Wink активен, цель правого глаза - 4px. Если нет - цель такая же, как у левого (eyeState.height)
-              let targetRightH = targetState.height;
-              if (isWinking) {
-                  targetRightH = 4; // Закрыть правый глаз
-                  // При подмигивании тоже белеем? Можно, но оставим цвет текущим для "хитрого" вида
-              }
-              
-              let speedRight = isWinking ? 0.35 : speed; // Быстро закрываем при винке
+              let targetRightH = targetState.height; if (isWinking) targetRightH = 4;
+              let speedRight = isWinking ? 0.35 : speed;
               currentRightHeight = lerp(currentRightHeight, targetRightH, speedRight);
-
-              // 5. Движение
               currentLook.x = lerp(currentLook.x, targetLook.x, 0.08);
               currentLook.y = lerp(currentLook.y, targetLook.y, 0.08);
-              
               const shake = isAngry ? 3 : 0;
-              const moveX = (currentLook.x * 35) + (Math.random() - 0.5) * shake; 
+              const moveX = (currentLook.x * 35) + (Math.random() - 0.5) * shake;
               const moveY = (currentLook.y * 25) + (Math.random() - 0.5) * shake;
-
-              // 6. Отрисовка
-              const eyeGap = 60; 
-
-              // Левый глаз (Использует общую eyeState.height)
+              const eyeGap = 60;
               drawEye(ctx, centerX - eyeGap + moveX, centerY + moveY, eyeState.width, eyeState.height, eyeState, true);
-              
-              // Правый глаз (Использует currentRightHeight)
               drawEye(ctx, centerX + eyeGap + moveX, centerY + moveY, eyeState.width, currentRightHeight, eyeState, false);
-
               requestAnimationFrame(animate);
           }
           animate();
