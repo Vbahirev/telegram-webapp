@@ -78,9 +78,7 @@
       .toast.show { visibility: visible; opacity: 1; bottom: 50px; }
       .toast.error { background-color: var(--danger); color: white; }
       .toast.success { background-color: var(--success); color: white; }
-      /* Доп стили для тоста с кнопкой */
       .toast-btn { margin-top:10px; padding:6px 12px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:white; border-radius:6px; cursor:pointer; font-weight:bold; }
-      
       .search-box { position: relative; }
       .results-list { position: absolute; top: 105%; left: 0; width: 100%; max-height: 200px; overflow-y: auto; background: var(--bg-panel); border: 2px solid var(--accent); border-radius: 10px; z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
       .res-item { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
@@ -242,7 +240,7 @@
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbzJ6icUZY-PlxOm31ywIqbCgalh5fGBeqQwC_OSj7fepZJ6Nk4s1RTOI9arRCD5L2Ry/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbyWWmM4-8-E--ELsHvrysWs5K3ThK6GA4coitfsVW6JxD2rU_1qvdCbLTaV0GkiPNQ/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -364,18 +362,7 @@
         })
         .catch(err => { 
             document.getElementById('loader').style.display='none'; 
-            // Показываем ваш ID на экране ошибки для сверки
-            document.body.innerHTML = `
-                <div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:var(--bg-app); color:var(--text-main);">
-                    <div style="font-size:60px; margin-bottom:20px;">⛔</div>
-                    <h2 style="color:var(--danger)">Ошибка доступа</h2>
-                    <p style="color:var(--text-sub); margin-bottom:20px; white-space: pre-wrap;">${err.message || err}</p>
-                    <div style="background:#eee; padding:10px; border-radius:8px; font-family:monospace; margin-top:10px;">
-                        Ваш ID: <strong>${TG_USER_ID || 'Не определен (ПК)'}</strong>
-                    </div>
-                    <p style="font-size:12px; color:#999; margin-top:15px;">Скопируйте ID выше и добавьте в лист Users (столбец A).</p>
-                </div>
-            `;
+            document.body.innerHTML = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:var(--bg-app); color:var(--text-main);"><div style="font-size:60px; margin-bottom:20px;">⛔</div><h2 style="color:var(--danger)">Ошибка доступа</h2><p style="color:var(--text-sub); margin-bottom:20px; white-space: pre-wrap;">${err.message || err}</p></div>`;
         });
       }
 
