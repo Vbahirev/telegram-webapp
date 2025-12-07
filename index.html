@@ -242,7 +242,7 @@
     <script>
       // ===============================================
       // 👇 ВСТАВЬ СЮДА ССЫЛКУ ПОСЛЕ ДЕПЛОЯ (ШАГ 2)
-      const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtBUGovKnu11wghfaGLDi7AB99HRFMRSTq7-e-BsS1C7f8gNOrVSCKuPdYmB2qDhwk/exec';
+      const GAS_URL = 'https://script.google.com/macros/s/AKfycbx_P65wJKXcnkCqkqQC0BLpCC2HtMZtw3iqH_wHh9PZpIJrt4fSFdUxKW_CSoWI65Yc/exec';
       // ===============================================
 
       const IS_GOOGLE = typeof google !== 'undefined' && google.script && google.script.run;
@@ -364,7 +364,18 @@
         })
         .catch(err => { 
             document.getElementById('loader').style.display='none'; 
-            document.body.innerHTML = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:var(--bg-app); color:var(--text-main);"><div style="font-size:60px; margin-bottom:20px;">⛔</div><h2 style="color:var(--danger)">Ошибка доступа</h2><p style="color:var(--text-sub); margin-bottom:20px; white-space: pre-wrap;">${err.message || err}</p></div>`;
+            // Показываем ваш ID на экране ошибки для сверки
+            document.body.innerHTML = `
+                <div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; background:var(--bg-app); color:var(--text-main);">
+                    <div style="font-size:60px; margin-bottom:20px;">⛔</div>
+                    <h2 style="color:var(--danger)">Ошибка доступа</h2>
+                    <p style="color:var(--text-sub); margin-bottom:20px; white-space: pre-wrap;">${err.message || err}</p>
+                    <div style="background:#eee; padding:10px; border-radius:8px; font-family:monospace; margin-top:10px;">
+                        Ваш ID: <strong>${TG_USER_ID || 'Не определен (ПК)'}</strong>
+                    </div>
+                    <p style="font-size:12px; color:#999; margin-top:15px;">Скопируйте ID выше и добавьте в лист Users (столбец A).</p>
+                </div>
+            `;
         });
       }
 
